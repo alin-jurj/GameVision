@@ -54,6 +54,7 @@ class InputBox:
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
     def get_text(self):
-        val = self.text
+        return self.text
+
+    def reset_text(self):
         self.text = ''
-        return val

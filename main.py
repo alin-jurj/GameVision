@@ -1,5 +1,7 @@
 import pygame
 import login_page
+import database.connectors as cn
+import mysql.connector
 
 pygame.init()
 
@@ -13,7 +15,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("ULTIMATE REFLEX FIGHTER")
 
 
-def main():
+def verify_empty(input_boxes):
+    for box in input_boxes:
+        if box.get_text() == "":
+            raise Exception("Cannot leave empty text boxes")
+
+
+def login():
     clock = pygame.time.Clock()
 
     input_box1 = login_page.InputBox(WIDTH / 2.4, HEIGHT / 1.7, 220, 30)
@@ -32,8 +40,27 @@ def main():
 
         if login_button.collidepoint((mouseX, mouseY)):
             if click:
-                for box in input_boxes:
-                    print(box.get_text())
+                try:
+                    verify_empty(input_boxes)
+                    db = mysql.connector.connect(
+                        host=cn.host,
+                        user=cn.user,
+                        passwd=cn.passwd,
+                        database=cn.database
+                    )
+
+                    mycursor = db.cursor()
+                    mycursor.execute("SELECT * FROM User WHERE username=%s AND password=%s",
+                                     (input_box1.get_text(), input_box2.get_text()))
+                    row = mycursor.fetchone()
+                    if row == None:
+                        print("Invalid username and password")
+                    else:
+                        print("Login successful")
+                    for box in input_boxes:
+                        box.reset_text()
+                except Exception as e:
+                    print(e)
 
         click = False
         for event in pygame.event.get():
@@ -55,4 +82,4 @@ def main():
     pygame.quit()
 
 
-main()
+login()
