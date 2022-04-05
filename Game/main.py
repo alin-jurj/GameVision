@@ -11,12 +11,6 @@ screen = pg.display.set_mode((WIDTH,HEIGHT))
 
 pg.display.set_caption("ULTIMATE REFLEX FIGHTER")
 
-#def draw_window():
-    #WIN.fill(WHITE)
-    #WIN.blit(YELLOW_SPACESHIP_IMAGE,(0,0))
-    
-    #pg.display.update()
-
 def main():
     clock = pg.time.Clock()
     input_box1 = FieldsButtons.InputBox(550, 400, 140, 32)
