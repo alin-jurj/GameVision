@@ -1,14 +1,8 @@
 import pygame
 
 pygame.init()
-clock = pygame.time.Clock()
 color = pygame.Color('gray99')
 FONT = pygame.font.Font(None, 32)
-
-FPS = 60
-WIDTH, HEIGHT = 1280, 720
-WHITE = (255, 255, 255)
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 class InputBox:
