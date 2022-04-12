@@ -1,6 +1,8 @@
 import pygame as pg
 import os
-import FieldsButtons
+from gui_elements import FieldsButtons
+import database.connectors as cn
+import mysql.connector
 pg.init()
 
 FPS = 60
@@ -10,6 +12,8 @@ WHITE = (255,255,255)
 screen = pg.display.set_mode((WIDTH,HEIGHT))
 
 pg.display.set_caption("ULTIMATE REFLEX FIGHTER")
+
+
 
 def main():
     clock = pg.time.Clock()
