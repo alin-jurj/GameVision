@@ -1,5 +1,6 @@
 import mysql.connector
-import connectors as cn
+import database.connectors as cn
+
 
 db = mysql.connector.connect(
     host=cn.host,
@@ -10,13 +11,30 @@ db = mysql.connector.connect(
 
 mycursor = db.cursor()
 
-# mycursor.execute("CREATE TABLE User (userId int PRIMARY KEY AUTO_INCREMENT, username VARCHAR(50), password VARCHAR(50))")
-# mycursor.execute("DESCRIBE User")
+def logs(input_box1,input_box2):
+    mycursor.execute("SELECT * FROM User WHERE username=%s AND password=%s",(input_box1.get_text(), input_box2.get_text()))
+    row = mycursor.fetchone()
+    return row
+def search_username(username_field):
+    mycursor.execute("SELECT * FROM User WHERE username=%s",(username_field.get_text(),))
+    row = mycursor.fetchone()
+    return row
+def search_email(email_field):
+    mycursor.execute("SELECT * FROM User WHERE email=%s",(email_field.get_text(),))
+    row = mycursor.fetchone()
+    return row
 
-# mycursor.execute("INSERT INTO User (username, password) VALUES (%s, %s)", ("dutz", "1234"))
-# db.commit()
+def add_user(username_field, password_field,email_field):
+    mycursor.execute("INSERT INTO User (username, password, email) VALUES (%s, %s,%s)", (username_field.get_text(), password_field.get_text(),email_field.get_text()))
+    db.commit()
+#mycursor.execute("CREATE DATABASE testdatabase")
+#mycursor.execute("CREATE TABLE User (userId int PRIMARY KEY AUTO_INCREMENT, username VARCHAR(50), password VARCHAR(50))")
+#mycursor.execute("DESCRIBE User")
 
-mycursor.execute("SELECT * FROM User")
+#mycursor.execute("INSERT INTO User (username, password, email) VALUES (%s, %s, %s)", ("alin", "1234","alin_jurj@yahoo.com"))
+#db.commit()
 
-for elem in mycursor:
-    print(elem)
+#mycursor.execute("SELECT * FROM User")
+
+#for elem in mycursor:
+#    print(elem)
