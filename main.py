@@ -1,12 +1,12 @@
 import pygame
-from gui_elements import login_page, buttons
+from gui_elements import input_box, buttons
 import database.connectors as cn
 import mysql.connector
 
 pygame.init()
 
 FPS = 60
-monster = pygame.image.load('assets/monster.png')
+monster = pygame.image.load('assets/icons/monster.png')
 background = pygame.image.load('assets/background_login_resized.png')
 login_image = pygame.image.load('assets/login.png')
 back_image = pygame.image.load('assets/back.png')

@@ -1,5 +1,5 @@
 import pygame
-from gui_elements import login_page, buttons
+from gui_elements import input_box, buttons
 from pages.main_page import main_page
 import database.connectors as cn
 import mysql.connector
@@ -7,14 +7,12 @@ import mysql.connector
 pygame.init()
 
 FPS = 60
-monster = pygame.image.load('assets/monster.png')
 background = pygame.image.load('assets/background_login_resized.png')
-login_image = pygame.image.load('assets/login.png')
-back_image = pygame.image.load('assets/back.png')
 WIDTH, HEIGHT = 1280, 720
 color = pygame.Color('red2')
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 FONT = pygame.font.Font(None, 32)
+button_font = pygame.font.SysFont('Arial', 20)
 
 pygame.display.set_caption("ULTIMATE REFLEX FIGHTER")
 
@@ -33,18 +31,19 @@ def invalid(text):
 def login():
     clock = pygame.time.Clock()
 
-    input_box1 = login_page.InputBox(WIDTH / 2.4, HEIGHT / 1.7, 220, 30)
-    input_box2 = login_page.InputBox(WIDTH / 2.4, HEIGHT / 1.5, 220, 30, hidden=True)
+    input_box1 = input_box.InputBox(WIDTH / 2.4, HEIGHT / 1.7, 220, 30)
+    input_box2 = input_box.InputBox(WIDTH / 2.4, HEIGHT / 1.5, 220, 30, hidden=True)
     input_boxes = [input_box1, input_box2]
 
-    login_button = buttons.Button(WIDTH / 2.4, HEIGHT / 1.3, login_image, 0.35)
-    back_button = buttons.Button(WIDTH / 2.4, HEIGHT / 1.15, back_image, 0.35)
+    login_button = buttons.Button('LOG IN', 200, 45, (540, 540), button_font)
+    back_button = buttons.Button('BACK', 200, 45, (540, 600), button_font)
 
     text = ""
     err = False
     run = True
     while run:
 
+        go_main = 0
         screen.fill((0, 0, 0))
         screen.blit(background, (0, 0))
         clock.tick(FPS)
@@ -67,6 +66,7 @@ def login():
                     text = "Invalid username and password"
                     err = True
                 else:
+                    go_main = 1
                     run = False
                     err = False
                 for box in input_boxes:
@@ -87,14 +87,13 @@ def login():
             for box in input_boxes:
                 box.handle_event(event)
 
-        screen.blit(monster, (0, 0))
-
         for box in input_boxes:
             box.draw(screen, background, input_boxes)
 
         pygame.display.update()
 
-    main_page()
+    if go_main:
+        main_page()
 
 
 login()

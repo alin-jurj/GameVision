@@ -1,27 +1,24 @@
 import pygame
 
 pygame.init()
-color = pygame.Color('gray99')
-FONT = pygame.font.Font(None, 32)
 
 
 class Button:
-    def __init__(self, x, y, img, scale):
-        width = img.get_width()
-        height = img.get_height()
-        self.img = pygame.transform.scale(img, (int(width * scale), int(height * scale)))
-        self.rect = self.img.get_rect()
-        self.rect.topleft = (x, y)
+    def __init__(self, text, width, height, pos, font):
+        self.top_rect = pygame.Rect(pos, (width, height))
+        self.top_color = '#2C7950'
+        self.text_surf = font.render(text, True, '#FFFFFF')
+        self.text_rect = self.text_surf.get_rect(center=self.top_rect.center)
         self.clicked = False
 
     def draw(self, screen):
         execute = False
-
-        screen.blit(self.img, (self.rect.x, self.rect.y))
+        pygame.draw.rect(screen, self.top_color, self.top_rect, border_radius=10)
+        screen.blit(self.text_surf, self.text_rect)
 
         mouseX, mouseY = pygame.mouse.get_pos()
 
-        if self.rect.collidepoint((mouseX, mouseY)):
+        if self.top_rect.collidepoint((mouseX, mouseY)):
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 execute = True
