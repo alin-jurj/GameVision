@@ -25,8 +25,17 @@ def search_email(email_field):
     return row
 
 def add_user(username_field, password_field,email_field):
-    mycursor.execute("INSERT INTO User (username, password, email) VALUES (%s, %s,%s)", (username_field.get_text(), password_field.get_text(),email_field.get_text()))
+    mycursor.execute("INSERT INTO User (username, password, email, wins, losses, lvl, xp) VALUES (%s, %s,%s, %s, %s, %s, %s)", (username_field.get_text(), password_field.get_text(),email_field.get_text(),0,3,1,0))
     db.commit()
+def all_ordered_users_by_win_rate():
+    mycursor.execute("SELECT * FROM User ORDER BY wins/(wins+losses) DESC")
+    row = mycursor.fetchall()
+    return row
+def delete_table():
+    mycursor.execute("DROP TABLE User")
+    db.commit()
+def create_table():
+    mycursor.execute("CREATE TABLE User (userId int PRIMARY KEY AUTO_INCREMENT, username VARCHAR(13), password VARCHAR(50), email VARCHAR(50), wins INT(7), losses INT(7), lvl INT(7), xp INT(7))")
 #mycursor.execute("CREATE DATABASE testdatabase")
 #mycursor.execute("CREATE TABLE User (userId int PRIMARY KEY AUTO_INCREMENT, username VARCHAR(50), password VARCHAR(50))")
 #mycursor.execute("DESCRIBE User")

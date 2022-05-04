@@ -1,5 +1,5 @@
 import pygame
-from gui_elements import after_login, login_page, buttons,register_page
+from gui_elements import after_login,leaderboard, login_page, buttons,register_page
 from database import queries
 #import database.connectors as cn
 
@@ -30,6 +30,9 @@ def login():
     #back_button = buttons.Button(WIDTH / 2.4, HEIGHT / 1.15, back_image, 0.35)
     login_button = buttons.Button('LOG IN',100, 30, (590,540))
     register_button = buttons.Button('REGISTER',100, 30, (590,580))
+    delete_table_button=buttons.Button('DELETE TABLE',100, 30, (200,300))
+    create_table_button=buttons.Button('CREATE TABLE',100, 30, (200,420))
+
     text = ""
     err=False
     run = True
@@ -40,6 +43,7 @@ def login():
         clock.tick(FPS)
 
         if login_button.draw(screen) == True:
+            leaderboard.draw(screen)   
             try:
                 login_page.verify_empty(input_boxes)
                 row=queries.logs(input_box1,input_box2)
@@ -49,7 +53,7 @@ def login():
     
                 else:
                     err=False
-                    after_login.draw(screen)     
+                    leaderboard.draw(screen)     
     
                 for box in input_boxes:
                     box.reset_text()
@@ -60,6 +64,10 @@ def login():
 
         if register_button.draw(screen) == True:
             register_page.register(screen)
+        if delete_table_button.draw(screen) == True:
+            queries.delete_table()
+        if create_table_button.draw(screen) == True:
+            queries.create_table()
         if err:
             login_page.invalid(text,screen,2.4,1.9)
         
