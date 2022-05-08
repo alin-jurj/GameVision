@@ -28,7 +28,7 @@ def add_user(username_field, password_field,email_field):
     mycursor.execute("INSERT INTO User (username, password, email, wins, losses, lvl, xp) VALUES (%s, %s,%s, %s, %s, %s, %s)", (username_field.get_text(), password_field.get_text(),email_field.get_text(),0,3,1,0))
     db.commit()
 def all_ordered_users_by_win_rate():
-    mycursor.execute("SELECT * FROM User ORDER BY wins/(wins+losses) DESC")
+    mycursor.execute("SELECT * FROM User ORDER BY wins/(wins+losses) DESC, wins DESC")
     row = mycursor.fetchall()
     return row
 def delete_table():

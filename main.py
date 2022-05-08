@@ -42,8 +42,7 @@ def login():
         screen.blit(background, (0, 0))
         clock.tick(FPS)
 
-        if login_button.draw(screen) == True:
-            leaderboard.draw(screen)   
+        if login_button.draw(screen) == True:  
             try:
                 login_page.verify_empty(input_boxes)
                 row=queries.logs(input_box1,input_box2)

@@ -1,6 +1,7 @@
 import pygame
-from gui_elements import login_page
+from gui_elements import login_page,buttons
 from database import queries
+
 bkg_reg = pygame.image.load('assets/leaderboardbkg.png')
 trophy_img = pygame.image.load('assets/trophy.png')
 trophy_img = pygame.transform.scale(trophy_img,(100,100))
@@ -10,6 +11,9 @@ silver_img = pygame.image.load('assets/silver.png')
 silver_img = pygame.transform.scale(silver_img,(40,50))
 bronze_img = pygame.image.load('assets/bronze.png')
 bronze_img = pygame.transform.scale(bronze_img,(40,50))
+back_arrow = pygame.image.load('assets/back_arrow.png')
+back_arrow = pygame.transform.scale(back_arrow,(40,50))
+
 medals=[gold_img,silver_img,bronze_img]
 FONT = pygame.font.Font(None, 68)
 page_name=FONT.render("LEADERBOARD",True,"white")
@@ -54,7 +58,7 @@ def print_fighter(screen,username,wins, losses,x):
         old_win_rate=aux
 def draw(screen):
     global counter, err,old_win_rate,counter_medals,count_given_medals
-    
+    back_button = buttons.Button('BACK',100,30,(100,50))
     running=True
     while running:
         
@@ -66,6 +70,10 @@ def draw(screen):
         screen.blit(wins_text,(550,250))
         screen.blit(losses_text,(650,250))
         screen.blit(win_rate_text,(750,250))
+
+    
+        if back_button.draw(screen) == True:
+           running=False
         #clock.tick(FPS)
         rows=queries.all_ordered_users_by_win_rate()
         counter=250

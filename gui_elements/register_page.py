@@ -11,6 +11,7 @@ def register(screen):
     email_field = login_page.InputBox(WIDTH / 2.4, HEIGHT / 1.5, 220, 30)
     
     input_boxes = [username_field,password_field,Confirmpassword_field,email_field]
+    back_button = buttons.Button('BACK',100,30,(100,50))
 
     #login_button = buttons.Button(WIDTH / 2.4, HEIGHT / 1.3, login_image, 0.35)
     #back_button = buttons.Button(WIDTH / 2.4, HEIGHT / 1.15, back_image, 0.35)
@@ -22,6 +23,8 @@ def register(screen):
     while run:
         screen.fill((0, 0, 0))
         screen.blit(bkg_reg, (0, 0))
+        if back_button.draw(screen) == True:
+           run=False
         if register_button.draw(screen) == True:
             try:
                 login_page.verify_empty(input_boxes)
