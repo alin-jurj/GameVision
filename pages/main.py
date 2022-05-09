@@ -28,7 +28,7 @@ def invalid(text):
     screen.blit(text, (WIDTH / 2.4, HEIGHT / 1.9))
 
 
-def login():
+def login(screen):
     clock = pygame.time.Clock()
 
     input_box1 = input_box.InputBox(WIDTH / 2.4, HEIGHT / 1.7, 220, 30)
@@ -93,7 +93,7 @@ def login():
         pygame.display.update()
 
     if go_main:
-        main_page()
+        main_page(screen)
 
 
-login()
+login(screen)
