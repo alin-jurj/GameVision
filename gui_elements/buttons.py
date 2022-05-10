@@ -2,6 +2,8 @@ import pygame
 
 pygame.init()
 
+gui_font = pygame.font.SysFont('Arial', 16)
+
 
 class Button:
     def __init__(self, text, width, height, pos, font):

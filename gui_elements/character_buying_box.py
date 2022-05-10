@@ -3,7 +3,7 @@ from gui_elements import buttons
 
 pygame.init()
 font = pygame.font.SysFont('Arial', 22)
-coin = pygame.image.load('assets/misc/coin.png')
+coin = pygame.image.load('../assets/misc/coin.png')
 
 
 # , image, hp, attack, defense, energy, price

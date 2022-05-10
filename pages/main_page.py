@@ -1,12 +1,13 @@
 import pygame
 from gui_elements import buttons, player_details, character_buying_box
+from pages import leaderboard
 
 pygame.init()
 
 FPS = 60
-background = pygame.image.load('assets/main_menu.png')
-monster = pygame.image.load('assets/icons/monster.png')
-character = pygame.image.load('assets/characters/Artemis1_resized.png')
+background = pygame.image.load('../assets/main_menu.png')
+monster = pygame.image.load('../assets/icons/monster.png')
+character = pygame.image.load('../assets/characters/Artemis1_resized.png')
 WIDTH, HEIGHT = 1280, 720
 color = pygame.Color('#2C7950')
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -30,9 +31,11 @@ def main_page(screen):
 
     player = player_details.Player_Details(360, 140, (900, 60), player_font, 'Dutz', 10, 100, 960, monster)
 
-    character_box = character_buying_box.Character_Buying_Box(240, 310, (900, 400), 'Artemis', character, 100, 20, 10, 100, 310)
+    character_box = character_buying_box.Character_Buying_Box(240, 310, (900, 400), 'Artemis', character, 100, 20, 10,
+                                                              100, 310)
 
     run = True
+    leaderboard_page = 0
     while run:
         screen.fill((0, 0, 0))
         screen.blit(background, (0, 0))
@@ -43,7 +46,11 @@ def main_page(screen):
         play_button.draw(screen)
         store_button.draw(screen)
         inventory_button.draw(screen)
-        leaderboard_button.draw(screen)
+
+        if leaderboard_button.draw(screen) == True:
+            leaderboard_page = 1
+            run = False
+
         profile_button.draw(screen)
         settings_button.draw(screen)
         player.draw(screen)
@@ -54,3 +61,6 @@ def main_page(screen):
                 run = False
 
         pygame.display.update()
+
+    if leaderboard_page == 1:
+        leaderboard.draw(screen)

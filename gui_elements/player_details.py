@@ -1,7 +1,7 @@
 import pygame
 
 pygame.init()
-coin = pygame.image.load('assets/misc/coin.png')
+coin = pygame.image.load('../assets/misc/coin.png')
 
 
 class Player_Details:

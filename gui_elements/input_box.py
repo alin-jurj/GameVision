@@ -3,6 +3,18 @@ import pygame
 pygame.init()
 color = pygame.Color('gray99')
 FONT = pygame.font.Font(None, 32)
+WIDTH, HEIGHT = 1280, 720
+
+
+def verify_empty(input_boxes):
+    for box in input_boxes:
+        if box.get_text() == "":
+            raise Exception("Cannot leave empty text boxes")
+
+
+def invalid(text, screen, x, y):
+    text = FONT.render(text, True, 'red2')
+    screen.blit(text, (WIDTH / x, HEIGHT / y))
 
 
 class InputBox:
