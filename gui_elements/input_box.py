@@ -4,13 +4,19 @@ pygame.init()
 color = pygame.Color('gray99')
 FONT = pygame.font.Font(None, 32)
 WIDTH, HEIGHT = 1280, 720
+
+
 def verify_empty(input_boxes):
-        for box in input_boxes:
-            if box.get_text() == "":
-                raise Exception("Cannot leave empty text boxes")
-def invalid(text,screen,x,y):
+    for box in input_boxes:
+        if box.get_text() == "":
+            raise Exception("Cannot leave empty text boxes")
+
+
+def invalid(text, screen, x, y):
     text = FONT.render(text, True, 'red2')
     screen.blit(text, (WIDTH / x, HEIGHT / y))
+
+
 class InputBox:
 
     def __init__(self, x, y, height, width, text='', hidden=False):
@@ -36,9 +42,8 @@ class InputBox:
                 if event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
-                    if event.key == pygame.K_RETURN:
-                        print(self.text)
-                        self.text = ''
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_TAB or event.key == pygame.K_ESCAPE:
+                        pass
                     else:
                         self.text = self.text + event.unicode
 
@@ -58,4 +63,3 @@ class InputBox:
 
     def reset_text(self):
         self.text = ''
-    
