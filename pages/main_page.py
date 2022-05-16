@@ -1,6 +1,6 @@
 import pygame
 from gui_elements import buttons, player_details, character_buying_box
-from pages import leaderboard
+from pages import leaderboard, play
 
 pygame.init()
 
@@ -36,6 +36,7 @@ def main_page(screen):
 
     run = True
     leaderboard_page = 0
+    play_page = 0
     while run:
         screen.fill((0, 0, 0))
         screen.blit(background, (0, 0))
@@ -43,11 +44,14 @@ def main_page(screen):
 
         screen.blit(game_name, (280, 260))
 
-        play_button.draw(screen)
+        if play_button.draw(screen):
+            play_page = 1
+            run = False
+
         store_button.draw(screen)
         inventory_button.draw(screen)
 
-        if leaderboard_button.draw(screen) == True:
+        if leaderboard_button.draw(screen):
             leaderboard_page = 1
             run = False
 
@@ -61,6 +65,9 @@ def main_page(screen):
                 run = False
 
         pygame.display.update()
+
+    if play_page == 1:
+        play.play(screen)
 
     if leaderboard_page == 1:
         leaderboard.draw(screen)
