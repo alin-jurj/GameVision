@@ -7,7 +7,7 @@ pygame.init()
 FPS = 60
 background = pygame.image.load('../assets/main_menu.png')
 monster = pygame.image.load('../assets/icons/monster.png')
-character = pygame.image.load('../assets/characters/Artemis1_resized.png')
+character = pygame.image.load('../assets/characters/body/artemis.png')
 WIDTH, HEIGHT = 1280, 720
 color = pygame.Color('#2C7950')
 screen = pygame.display.set_mode((WIDTH, HEIGHT))

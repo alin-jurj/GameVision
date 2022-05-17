@@ -3,13 +3,14 @@ import pygame
 pygame.init()
 
 
-class Map:
-    def __init__(self, image, scale, pos):
+class ImageButton:
+    def __init__(self, image, scale, pos, name=""):
         self.width = image.get_width()
         self.height = image.get_height()
         self.image = pygame.transform.scale(image, (int(self.width * scale), int(self.height * scale)))
         self.pos = pos
         self.top_rect = self.image.get_rect(topleft=self.pos)
+        self.name = name
         self.clicked = False
 
     def draw(self, screen):
@@ -27,3 +28,6 @@ class Map:
             self.clicked = False
 
         return execute
+
+    def get_name(self):
+        return self.name

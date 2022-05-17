@@ -20,8 +20,6 @@ print("Waiting for a connection. Server started.")
 
 def read_information(str):
     str = str.split(',')
-    print(str)
-    print(str[0])
     if str[0] == 'play':
         return int(str[1])
     else:

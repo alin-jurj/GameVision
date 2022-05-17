@@ -1,6 +1,6 @@
 import pygame
 from network import Network
-from gui_elements import buttons, map_selector
+from gui_elements import buttons, map_selector, character_selector
 
 pygame.init()
 
@@ -13,6 +13,22 @@ map3_img = pygame.image.load('../assets/maps/map_3.png')
 green_check = pygame.image.load('../assets/misc/green_check.png')
 red_check = pygame.image.load('../assets/misc/red_check.png')
 button_font = pygame.font.SysFont('Arial', 20)
+path_to_char = '../assets/characters/heads/'
+ada_head = 'ada'
+ada = pygame.image.load(path_to_char + ada_head + '.png')
+# ada = pygame.image.load('../assets/characters/heads/ada.png')
+artemis = pygame.image.load('../assets/characters/heads/artemis.png')
+magyar = pygame.image.load('../assets/characters/heads/magyar.png')
+onyx = pygame.image.load('../assets/characters/heads/onyx.png')
+ragnir = pygame.image.load('../assets/characters/heads/ragnir.png')
+mako = pygame.image.load('../assets/characters/heads/mako.png')
+
+
+def scale_image(image, scale):
+    width = image.get_width()
+    height = image.get_height()
+    new_image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+    return new_image
 
 
 def selections(map):
@@ -37,8 +53,12 @@ def play(screen):
 
     ready_button = buttons.Button('READY', 200, 45, (540, 650), button_font)
 
+    character_sel = character_selector.CharacterSelector((120, 120), [ada, artemis, magyar, onyx, ragnir, mako], 0.9,
+                                                         ['ada', 'artemis', 'magyar', 'onyx', 'ragnir', 'mako'])
+
     selected_map = -1
     enemy_selected_map = read_selections(n.send(selections(selected_map)))
+    character_choice = ""
 
     while run:
         screen.fill((0, 0, 0))
@@ -46,6 +66,15 @@ def play(screen):
         clock.tick(FPS)
 
         enemy_selected_map = read_selections(n.send(selections(selected_map)))
+
+        choice = character_sel.draw(screen)
+
+        if choice:
+            character_choice = choice
+
+        if character_choice:
+            selected_character = pygame.image.load('../assets/characters/body/' + character_choice + '.png')
+            screen.blit(scale_image(selected_character, 1.2), (640, 140))
 
         if map1.draw(screen):
             selected_map = 1
