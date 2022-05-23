@@ -1,6 +1,7 @@
 import pygame
 from network import Network
-from gui_elements import buttons, map_selector, character_selector
+from gui_elements import buttons, map_selector, character_selector, image_buttons
+from pages import main_page
 
 pygame.init()
 
@@ -22,6 +23,10 @@ magyar = pygame.image.load('../assets/characters/heads/magyar.png')
 onyx = pygame.image.load('../assets/characters/heads/onyx.png')
 ragnir = pygame.image.load('../assets/characters/heads/ragnir.png')
 mako = pygame.image.load('../assets/characters/heads/mako.png')
+FONT = pygame.font.Font(None, 56)
+text_character = FONT.render('CHARACTER SELECT', True, '#FFFFFF')
+text_stage = FONT.render('STAGE SELECT', True, '#FFFFFF')
+back = pygame.image.load('../assets/misc/back.png')
 
 
 def scale_image(image, scale):
@@ -31,13 +36,13 @@ def scale_image(image, scale):
     return new_image
 
 
-def selections(map):
-    return 'play,' + str(map) + ','
+def selections(map, character, ready):
+    return 'play,' + str(map) + ',' + character + ',' + str(ready)
 
 
 def read_selections(data):
     data = data.split(',')
-    return int(data[1])
+    return int(data[1]), data[2], int(data[3])
 
 
 def play(screen):
@@ -52,20 +57,29 @@ def play(screen):
     map3 = map_selector.Map(map3_img, 0.25, (880, 460))
 
     ready_button = buttons.Button('READY', 200, 45, (540, 650), button_font)
+    back_button = image_buttons.ImageButton(back, 1, (1136, 24))
 
     character_sel = character_selector.CharacterSelector((120, 120), [ada, artemis, magyar, onyx, ragnir, mako], 0.9,
                                                          ['ada', 'artemis', 'magyar', 'onyx', 'ragnir', 'mako'])
 
+    main = 0
     selected_map = -1
-    enemy_selected_map = read_selections(n.send(selections(selected_map)))
     character_choice = ""
+    player_ready = 0
+    enemy_selected_map, enemy_character, enemy_ready = read_selections(
+        n.send(selections(selected_map, character_choice, player_ready)))
 
     while run:
         screen.fill((0, 0, 0))
         screen.blit(background, (0, 0))
         clock.tick(FPS)
 
-        enemy_selected_map = read_selections(n.send(selections(selected_map)))
+        screen.blit(text_character, (80, 60))
+        screen.blit(text_stage, (80, 400))
+        screen.blit(back, (1136, 24))
+
+        enemy_selected_map, enemy_character, enemy_ready = read_selections(
+            n.send(selections(selected_map, character_choice, player_ready)))
 
         choice = character_sel.draw(screen)
 
@@ -74,7 +88,17 @@ def play(screen):
 
         if character_choice:
             selected_character = pygame.image.load('../assets/characters/body/' + character_choice + '.png')
-            screen.blit(scale_image(selected_character, 1.2), (640, 140))
+            screen.blit(scale_image(selected_character, 1.2), (560, 140))
+
+        if enemy_character:
+            enemy_selected_character = pygame.image.load('../assets/characters/body/' + enemy_character + '.png')
+            img_copy = enemy_selected_character.copy()
+            flipped_character = pygame.transform.flip(img_copy, True, False)
+            screen.blit(scale_image(flipped_character, 1.2), (1000, 140))
+
+        if back_button.draw(screen):
+            run = 0
+            main = 1
 
         if map1.draw(screen):
             selected_map = 1
@@ -103,14 +127,26 @@ def play(screen):
         if enemy_selected_map == 3:
             screen.blit(red_check, (1136, 576))
 
-        if ready_button.draw(screen):
-            print('Ready')
+        if player_ready == 1:
+            screen.blit(green_check, (780, 315))
+
+        if enemy_ready == 1:
+            screen.blit(red_check, (1000, 315))
+
+        if ready_button.draw(screen) and character_choice:
+            if player_ready == 0:
+                player_ready = 1
+            else:
+                player_ready = 0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
         pygame.display.update()
+
+    if main == 1:
+        main_page.main_page(screen)
 
 
 if __name__ == '__main__':
