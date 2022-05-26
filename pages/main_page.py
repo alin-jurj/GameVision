@@ -1,13 +1,14 @@
 import pygame
 from gui_elements import buttons, player_details, character_buying_box
 from pages import leaderboard, play
+from play import scale_image
+from database import queries
 
 pygame.init()
 
 FPS = 60
 background = pygame.image.load('../assets/main_menu.png')
 monster = pygame.image.load('../assets/icons/monster.png')
-character = pygame.image.load('../assets/characters/body/artemis.png')
 WIDTH, HEIGHT = 1280, 720
 color = pygame.Color('#2C7950')
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -19,7 +20,7 @@ game_name = FONT.render('ULTIMATE REFLEX FIGHTER', True, '#B2B600')
 pygame.display.set_caption("ULTIMATE REFLEX FIGHTER")
 
 
-def main_page(screen):
+def main_page(screen, logged_in_user):
     clock = pygame.time.Clock()
 
     play_button = buttons.Button('PLAY', 200, 45, (110, 360), button_font)
@@ -29,10 +30,20 @@ def main_page(screen):
     profile_button = buttons.Button('PROFILE', 200, 45, (110, 600), button_font)
     settings_button = buttons.Button('SETTINGS', 200, 45, (110, 660), button_font)
 
-    player = player_details.Player_Details(360, 140, (900, 60), player_font, 'Dutz', 10, 100, 960, monster)
+    player = player_details.Player_Details(360, 140, (900, 60), player_font, logged_in_user.get_username(),
+                                           logged_in_user.get_lvl(), logged_in_user.get_xp(),
+                                           logged_in_user.get_money(), monster)
 
-    character_box = character_buying_box.Character_Buying_Box(240, 310, (900, 400), 'Artemis', character, 100, 20, 10,
-                                                              100, 310)
+    random_champ_row = queries.select_random_champion(logged_in_user.get_userId())
+    if random_champ_row:
+        character = pygame.image.load('../assets/characters/body/' + random_champ_row[0] + '.png')
+        resized_image = scale_image(character, 0.8)
+
+        character_box = character_buying_box.Character_Buying_Box(240, 310, (900, 400), random_champ_row[0],
+                                                                  resized_image,
+                                                                  random_champ_row[1],
+                                                                  random_champ_row[2], random_champ_row[3],
+                                                                  random_champ_row[4], random_champ_row[5])
 
     run = True
     leaderboard_page = 0
@@ -58,7 +69,9 @@ def main_page(screen):
         profile_button.draw(screen)
         settings_button.draw(screen)
         player.draw(screen)
-        character_box.draw(screen)
+
+        if random_champ_row:
+            character_box.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -67,7 +80,7 @@ def main_page(screen):
         pygame.display.update()
 
     if play_page == 1:
-        play.play(screen)
+        play.play(screen, logged_in_user)
 
     if leaderboard_page == 1:
-        leaderboard.draw(screen)
+        leaderboard.draw(screen, logged_in_user)

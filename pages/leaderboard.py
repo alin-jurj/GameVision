@@ -35,8 +35,12 @@ err = False
 def print_fighter(screen, username, wins, losses, x):
     global old_win_rate, counter_medals, count_given_medals, err
 
-    aux = (wins / (losses + wins)) * 100
+    aux_losses = losses
+    if losses == 0 and wins == 0:
+        aux_losses = 1
+    aux = (wins / (aux_losses + wins)) * 100
     aux = int(aux)
+
     if err == False:
         if aux == old_win_rate:
             screen.blit(medals[counter_medals], (150, 300 + (50 * count_given_medals)))
@@ -61,9 +65,10 @@ def print_fighter(screen, username, wins, losses, x):
         old_win_rate = aux
 
 
-def draw(screen):
+def draw(screen, logged_in_user):
     global counter, err, old_win_rate, counter_medals, count_given_medals
     back_button = buttons.Button('BACK', 100, 30, (100, 50), gui_font)
+
     running = True
     while running:
 
@@ -89,10 +94,11 @@ def draw(screen):
         counter_medals = -1
         count_given_medals = 0
         err = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
         pygame.display.update()
 
-    main_page.main_page(screen)
+    main_page.main_page(screen, logged_in_user)

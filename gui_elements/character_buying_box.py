@@ -8,7 +8,7 @@ coin = pygame.image.load('../assets/misc/coin.png')
 
 # , image, hp, attack, defense, energy, price
 class Character_Buying_Box:
-    def __init__(self, width, height, pos, name, image, hp, attack, defense, mana, price):
+    def __init__(self, width, height, pos, name, image, hp, attack, defense, energy, price):
         self.top_rect = pygame.Rect(pos, (width, height))
         self.surf = pygame.Surface((width, height))
         self.surf.set_alpha(128)
@@ -23,8 +23,8 @@ class Character_Buying_Box:
         self.attack_rect = self.attack.get_rect(topleft=(self.top_rect.centerx + 10, self.top_rect.centery + 60))
         self.defense = font.render("Defense: " + str(defense), True, '#FFFFFF')
         self.defense_rect = self.defense.get_rect(topleft=(self.top_rect.centerx + 10, self.top_rect.centery + 90))
-        self.mana = font.render("Mana: " + str(mana), True, '#FFFFFF')
-        self.mana_rect = self.mana.get_rect(topleft=(self.top_rect.centerx - 100, self.top_rect.centery + 90))
+        self.energy = font.render("Energy: " + str(energy), True, '#FFFFFF')
+        self.energy_rect = self.energy.get_rect(topleft=(self.top_rect.centerx - 100, self.top_rect.centery + 90))
         self.price = font.render(str(price), True, '#FFFFFF')
         self.price_rect = self.price.get_rect(topleft=(self.top_rect.centerx - 70, self.top_rect.centery + 120))
         self.coins = coin
@@ -38,7 +38,7 @@ class Character_Buying_Box:
         screen.blit(self.hp, self.hp_rect)
         screen.blit(self.attack, self.attack_rect)
         screen.blit(self.defense, self.defense_rect)
-        screen.blit(self.mana, self.mana_rect)
+        screen.blit(self.energy, self.energy_rect)
         screen.blit(self.price, self.price_rect)
         screen.blit(self.coins, self.coins_rect)
         if self.buy_button.draw(screen) == True:
