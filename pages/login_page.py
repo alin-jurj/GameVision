@@ -1,7 +1,9 @@
 import pygame
 from gui_elements import input_box, buttons
-from pages import main_page, register_page
+from pages import main_page
+from register_page import register
 from database import queries
+from models import user
 
 # import database.connectors as cn
 
@@ -32,9 +34,11 @@ def login():
     create_table_button = buttons.Button('CREATE TABLE', 100, 30, (200, 420), gui_font)
 
     text = ""
+    main = 0
+    go_register = 0
+
     err = False
     run = True
-    main = 0
 
     while run:
 
@@ -42,31 +46,40 @@ def login():
         screen.blit(background, (0, 0))
         clock.tick(FPS)
 
-        if login_button.draw(screen) == True:
+        if login_button.draw(screen):
+            text = ""
+
             try:
                 input_box.verify_empty(input_boxes)
                 row = queries.logs(input_box1, input_box2)
+
                 if row == None:
                     err = True
                     text = "Invalid username and password"
-
                 else:
                     err = False
                     run = False
+                    logged_in_user = user.User(row[0], row[1], row[3], row[4], row[5], row[6], row[7], row[8])
                     main = 1
 
                 for box in input_boxes:
                     box.reset_text()
+
             except Exception:
                 err = True
-                text = "Cannot leave empty text boxes"
+                if text == "":
+                    text = "Cannot leave empty text boxes"
 
-        if register_button.draw(screen) == True:
-            register_page.register(screen)
-        if delete_table_button.draw(screen) == True:
+        if register_button.draw(screen):
+            run = False
+            go_register = 1
+
+        if delete_table_button.draw(screen):
             queries.delete_table()
-        if create_table_button.draw(screen) == True:
+
+        if create_table_button.draw(screen):
             queries.create_table()
+
         if err:
             input_box.invalid(text, screen, 2.4, 1.9)
 
@@ -83,8 +96,11 @@ def login():
 
         pygame.display.update()
 
+    if go_register == 1:
+        register(screen)
+
     if main == 1:
-        main_page.main_page(screen)
+        main_page.main_page(screen, logged_in_user)
 
     pygame.quit()
 

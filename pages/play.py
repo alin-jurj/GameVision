@@ -2,6 +2,7 @@ import pygame
 from network import Network
 from gui_elements import buttons, map_selector, character_selector, image_buttons
 from pages import main_page
+from database import queries
 
 pygame.init()
 
@@ -15,14 +16,6 @@ green_check = pygame.image.load('../assets/misc/green_check.png')
 red_check = pygame.image.load('../assets/misc/red_check.png')
 button_font = pygame.font.SysFont('Arial', 20)
 path_to_char = '../assets/characters/heads/'
-ada_head = 'ada'
-ada = pygame.image.load(path_to_char + ada_head + '.png')
-# ada = pygame.image.load('../assets/characters/heads/ada.png')
-artemis = pygame.image.load('../assets/characters/heads/artemis.png')
-magyar = pygame.image.load('../assets/characters/heads/magyar.png')
-onyx = pygame.image.load('../assets/characters/heads/onyx.png')
-ragnir = pygame.image.load('../assets/characters/heads/ragnir.png')
-mako = pygame.image.load('../assets/characters/heads/mako.png')
 FONT = pygame.font.Font(None, 56)
 text_character = FONT.render('CHARACTER SELECT', True, '#FFFFFF')
 text_stage = FONT.render('STAGE SELECT', True, '#FFFFFF')
@@ -45,7 +38,7 @@ def read_selections(data):
     return int(data[1]), data[2], int(data[3])
 
 
-def play(screen):
+def play(screen, logged_in_user):
     clock = pygame.time.Clock()
 
     run = True
@@ -59,8 +52,15 @@ def play(screen):
     ready_button = buttons.Button('READY', 200, 45, (540, 650), button_font)
     back_button = image_buttons.ImageButton(back, 1, (1136, 24))
 
-    character_sel = character_selector.CharacterSelector((120, 120), [ada, artemis, magyar, onyx, ragnir, mako], 0.9,
-                                                         ['ada', 'artemis', 'magyar', 'onyx', 'ragnir', 'mako'])
+    owned_champions = []
+    images = []
+    owned_champions_rows = queries.get_owned_champions(logged_in_user.get_userId())
+    for row in owned_champions_rows:
+        owned_champions.append(row[1])
+        character = pygame.image.load(path_to_char + row[1] + '.png')
+        images.append(character)
+
+    character_sel = character_selector.CharacterSelector((120, 120), images, 0.9, owned_champions)
 
     main = 0
     selected_map = -1
@@ -146,8 +146,4 @@ def play(screen):
         pygame.display.update()
 
     if main == 1:
-        main_page.main_page(screen)
-
-
-if __name__ == '__main__':
-    play(screen=pygame.display.set_mode((WIDTH, HEIGHT)))
+        main_page.main_page(screen, logged_in_user)

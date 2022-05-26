@@ -1,10 +1,11 @@
-
 class Character:
-    def __init__(self, hp, attack, defense, energy, block_status=False):
+    def __init__(self, hp, attack, defense, energy, price, block_status=False):
         self.hp = hp
         self.attack = attack
         self.defense = defense
         self.energy = energy
+        self.price = price
+        self.block_status = block_status
 
     def get_hp(self):
         return self.hp
