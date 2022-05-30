@@ -56,8 +56,12 @@ def register(screen):
                             err = False
                             queries.add_user(username_field, password_field, email_field)
                             row = queries.search_username(username_field)
-                            queries.add_champion(row[0], 1)
-                            queries.add_champion(row[0], 2)
+                            artemis = queries.get_champion_by_name('Artemis')
+                            ragnir = queries.get_champion_by_name('Ragnir')
+                            queries.add_user_champion(row[0], artemis[0])
+                            queries.add_user_champion(row[0], ragnir[0])
+                            queries.add_user_icon(row[0], 1)
+                            queries.add_user_icon(row[0], 2)
                 for box in input_boxes:
                     box.reset_text()
             except Exception:
