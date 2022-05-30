@@ -59,7 +59,7 @@ def login():
                 else:
                     err = False
                     run = False
-                    logged_in_user = user.User(row[0], row[1], row[3], row[4], row[5], row[6], row[7], row[8])
+                    logged_in_user = user.User(row[0], row[1], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
                     main = 1
 
                 for box in input_boxes:

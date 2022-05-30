@@ -97,7 +97,7 @@ def play(screen, logged_in_user):
             screen.blit(scale_image(flipped_character, 1.2), (1000, 140))
 
         if back_button.draw(screen):
-            run = 0
+            run = False
             main = 1
 
         if map1.draw(screen):
