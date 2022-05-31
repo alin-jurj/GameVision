@@ -13,15 +13,19 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen(2)
+s.listen()
 
 print("Waiting for a connection. Server started.")
 
+connected = set()
+games = {}
+idCount = 0
 
-def read_information(str):
-    str = str.split(',')
-    if str[0] == 'play':
-        return [str[0], int(str[1]), str[2], int(str[3])]
+
+def read_information(string):
+    string = string.split(',')
+    if string[0] == 'play':
+        return [string[0], int(string[1]), string[2], int(string[3])]
     else:
         return -1
 
@@ -30,14 +34,14 @@ def make_information_play(selections):
     return 'play,' + str(selections[0]) + ',' + selections[1] + ',' + str(selections[2])
 
 
-pos = [(100, 50), (900, 50)]
-selected_map = [-1, -1]
-selected_character = ['', '']
-ready = [0, 0]
+selected_map = {}
+selected_character = {}
+ready = {}
+game_connected = {}
 
 
-def threaded_client(connection, player):
-    inf = [selected_map[player], selected_character[player], ready[player]]
+def threaded_client(connection, player, gameId):
+    inf = [selected_map[gameId][player], selected_character[gameId][player], ready[gameId][player]]
     connection.send(str.encode(make_information_play(inf)))
     reply = -1
 
@@ -45,9 +49,9 @@ def threaded_client(connection, player):
         try:
             data = read_information(connection.recv(2048).decode())
             if data[0] == 'play':
-                selected_map[player] = data[1]
-                selected_character[player] = data[2]
-                ready[player] = data[3]
+                selected_map[gameId][player] = data[1]
+                selected_character[gameId][player] = data[2]
+                ready[gameId][player] = data[3]
             else:
                 print("NU")
 
@@ -56,9 +60,9 @@ def threaded_client(connection, player):
                 break
             else:
                 if player == 1:
-                    reply = [selected_map[0], selected_character[0], ready[0]]
+                    reply = [selected_map[gameId][0], selected_character[gameId][0], ready[gameId][0]]
                 else:
-                    reply = [selected_map[1], selected_character[1], ready[1]]
+                    reply = [selected_map[gameId][1], selected_character[gameId][1], ready[gameId][1]]
 
                 print("Received: ", data)
                 print("Sending: ", reply)
@@ -69,15 +73,31 @@ def threaded_client(connection, player):
             break
 
     print("Lost connection")
+    try:
+        del selected_map[gameId]
+        del selected_character[gameId]
+        del ready[gameId]
+        del game_connected[gameId]
+        print("Closing game ", gameId)
+    except:
+        pass
     connection.close()
 
-
-currentPlayer = 0
 
 while True:
     connection, address = s.accept()
     print("Connected to ", address)
 
-    start_new_thread(threaded_client, (connection, currentPlayer))
+    idCount += 1
+    p = 0
+    gameId = (idCount - 1) // 2
+    if idCount % 2 == 1:
+        selected_map[gameId] = [-1, -1]
+        selected_character[gameId] = ['', '']
+        ready[gameId] = [0, 0]
+        game_connected[gameId] = False
+    else:
+        game_connected[gameId] = True
+        p = 1
 
-    currentPlayer += 1
+    start_new_thread(threaded_client, (connection, p, gameId))
