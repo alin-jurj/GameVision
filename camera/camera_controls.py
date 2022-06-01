@@ -5,7 +5,6 @@ import pygame
 import numpy as np
 import mediapipe as mp
 import matplotlib.pyplot as plt
-from hand_detector import HandDetector
 
 # Initialize the mediapipe hands class.
 mp_hands = mp.solutions.hands
@@ -165,58 +164,3 @@ def countFingers(image, results, draw=True, display=True):
 
         # Return the output image, the status of each finger and the count of the fingers up of both hands.
         return output_image, fingers_statuses, count
-
-
-# Initialize the VideoCapture object to read from the webcam.
-camera_video = cv2.VideoCapture(0)
-camera_video.set(3, 1280)
-camera_video.set(4, 960)
-
-# Create named window for resizing purposes.
-cv2.namedWindow('Fingers Counter', cv2.WINDOW_NORMAL)
-
-detector = HandDetector(detectionCon=0.8, maxHands=1)
-
-
-# Iterate until the webcam is accessed successfully.
-while camera_video.isOpened():
-
-    # Read a frame.
-    ok, frame = camera_video.read()
-
-    hands, img = detector.findHands(frame)
-
-    if hands:
-        lmList = hands[0]['lmList']
-        pointIndex = lmList[8][0:2]
-        cv2.circle(img, pointIndex, 20, (200, 0, 200), cv2.FILLED)
-
-    # Check if frame is not read properly then continue to the next iteration to read the next frame.
-    if not ok:
-        continue
-
-    # Flip the frame horizontally for natural (selfie-view) visualization.
-    frame = cv2.flip(frame, 1)
-
-    # Perform Hands landmarks detection on the frame.
-    frame, results = detectHandsLandmarks(frame, hands_videos, display=False)
-
-    # Check if the hands landmarks in the frame are detected.
-    if results.multi_hand_landmarks:
-        # Count the number of fingers up of each hand in the frame.
-        frame, fingers_statuses, count = countFingers(frame, results, display=False)
-        print(fingers_statuses)
-
-    # Display the frame.
-    cv2.imshow('Fingers Counter', frame)
-
-    # Wait for 1ms. If a key is pressed, retreive the ASCII code of the key.
-    k = cv2.waitKey(1) & 0xFF
-
-    # Check if 'ESC' is pressed and break the loop.
-    if (k == 27):
-        break
-
-# Release the VideoCapture Object and close the windows.
-camera_video.release()
-cv2.destroyAllWindows()

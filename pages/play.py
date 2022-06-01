@@ -203,7 +203,7 @@ def play(screen, logged_in_user):
             champ_skill = skill.Skill(row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]))
             enemy_skills.append(champ_skill)
 
-        game.game(screen, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills)
+        game.game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills)
 
     if main:
         main_page.main_page(screen, logged_in_user)
