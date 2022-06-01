@@ -1,6 +1,6 @@
 import pygame
 from gui_elements import buttons, player_details, character_buying_box
-from pages import leaderboard, play, store
+from pages import leaderboard, play, store, inventory
 from play import scale_image
 from database import queries
 
@@ -47,7 +47,6 @@ def main_page(screen, logged_in_user):
     inventory_button = buttons.Button('INVENTORY', 200, 45, (110, 480), button_font)
     leaderboard_button = buttons.Button('LEADERBOARD', 200, 45, (110, 540), button_font)
     profile_button = buttons.Button('PROFILE', 200, 45, (110, 600), button_font)
-    settings_button = buttons.Button('SETTINGS', 200, 45, (110, 660), button_font)
 
     player_icon_name = queries.get_equiped_icon_name(logged_in_user.get_userId())
     icon = pygame.image.load('../assets/icons/' + player_icon_name[0] + '.png')
@@ -64,6 +63,7 @@ def main_page(screen, logged_in_user):
     leaderboard_page = False
     play_page = False
     store_page = False
+    inventory_page = False
 
     while run:
         screen.fill((0, 0, 0))
@@ -80,14 +80,15 @@ def main_page(screen, logged_in_user):
             store_page = True
             run = False
 
-        inventory_button.draw(screen)
+        if inventory_button.draw(screen):
+            inventory_page = True
+            run = False
 
         if leaderboard_button.draw(screen):
             leaderboard_page = True
             run = False
 
         profile_button.draw(screen)
-        settings_button.draw(screen)
         player.draw(screen)
 
         if character_box:
@@ -119,3 +120,6 @@ def main_page(screen, logged_in_user):
 
     if store_page:
         store.store(screen, logged_in_user)
+
+    if inventory_page:
+        inventory.inventory(screen, logged_in_user)

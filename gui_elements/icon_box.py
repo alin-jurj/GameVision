@@ -8,7 +8,7 @@ coin = pygame.image.load('../assets/misc/coin.png')
 
 
 class IconBox:
-    def __init__(self, width, height, pos, icon_id, name, image, price, owned=False, show_owned=True):
+    def __init__(self, width, height, pos, icon_id, name, image, price, owned=False, show_owned=True, equip=False):
         self.top_rect = pygame.Rect(pos, (width, height))
         self.surf = pygame.Surface((width, height))
         self.surf.set_alpha(128)
@@ -26,6 +26,8 @@ class IconBox:
         self.buy_button = buttons.Button('BUY', 60, 25, (self.top_rect.centerx + 10, self.top_rect.centery + 65), font)
         self.owned = owned
         self.show_owned = show_owned
+        self.equip = equip
+        self.equip_button = buttons.Button('EQUIP', 60, 25, (self.top_rect.centerx - 30, self.top_rect.centery + 65), font)
 
     def draw(self, screen, logged_in_user):
         screen.blit(self.surf, self.top_rect)
@@ -37,6 +39,16 @@ class IconBox:
                 owned_text_rect = owned_text.get_rect(
                     center=(self.top_rect.midbottom[0], self.top_rect.midbottom[1] - 20))
                 screen.blit(owned_text, owned_text_rect)
+            if self.equip:
+                equipped_text = font.render('EQUIPPED', True, '#FFFFFF')
+                equipped_text_rect = equipped_text.get_rect(
+                    center=(self.top_rect.midbottom[0], self.top_rect.midbottom[1] - 20))
+                if self.icon_id == logged_in_user.get_equipped_icon():
+                    screen.blit(equipped_text, equipped_text_rect)
+                else:
+                    if self.equip_button.draw(screen):
+                        queries.update_user_icon(logged_in_user.get_userId(), self.icon_id)
+                        logged_in_user.set_equipped_icon(self.icon_id)
         else:
             screen.blit(self.price, self.price_rect)
             screen.blit(self.coins, self.coins_rect)
@@ -46,5 +58,4 @@ class IconBox:
                     queries.add_user_icon(logged_in_user.get_userId(), self.icon_id)
                     return self.icon_price
                 else:
-                    print("Not enough money")
                     return -1

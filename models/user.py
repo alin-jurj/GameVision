@@ -30,3 +30,6 @@ class User:
 
     def get_equipped_icon(self):
         return self.equipped_icon
+
+    def set_equipped_icon(self, icon_id):
+        self.equipped_icon = icon_id

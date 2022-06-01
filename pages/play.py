@@ -133,6 +133,13 @@ def play(screen, logged_in_user):
         if enemy_ready == 1:
             screen.blit(red_check, (1000, 315))
 
+        if player_ready and enemy_ready:
+            duration = 100
+            while duration > 0:
+                duration -= 1
+
+
+
         if ready_button.draw(screen) and character_choice:
             if player_ready == 0:
                 player_ready = 1
