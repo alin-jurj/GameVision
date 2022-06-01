@@ -26,6 +26,8 @@ def read_information(string):
     string = string.split(',')
     if string[0] == 'play':
         return [string[0], int(string[1]), string[2], int(string[3])]
+    elif string[0] == 'game':
+        return [string[0], int(string[1]), int(string[2])]
     else:
         return -1
 
@@ -34,10 +36,16 @@ def make_information_play(selections):
     return 'play,' + str(selections[0]) + ',' + selections[1] + ',' + str(selections[2])
 
 
+def make_information_game(information):
+    return 'game,' + str(information[0]) + ',' + str(information[1])
+
 selected_map = {}
 selected_character = {}
 ready = {}
 game_connected = {}
+player = {}
+positions_x = {}
+positions_y = {}
 
 
 def threaded_client(connection, player, gameId):
@@ -52,22 +60,34 @@ def threaded_client(connection, player, gameId):
                 selected_map[gameId][player] = data[1]
                 selected_character[gameId][player] = data[2]
                 ready[gameId][player] = data[3]
+            elif data[0] == 'game':
+                positions_x[gameId][player] = data[1]
+                positions_y[gameId][player] = data[2]
             else:
-                print("NU")
+                print('NU')
 
             if not data:
                 print("Disconnected")
                 break
             else:
-                if player == 1:
-                    reply = [selected_map[gameId][0], selected_character[gameId][0], ready[gameId][0]]
-                else:
-                    reply = [selected_map[gameId][1], selected_character[gameId][1], ready[gameId][1]]
+                if data[0] == 'play':
+                    if player == 1:
+                        reply = [selected_map[gameId][0], selected_character[gameId][0], ready[gameId][0]]
+                    else:
+                        reply = [selected_map[gameId][1], selected_character[gameId][1], ready[gameId][1]]
+                elif data[0] == 'game':
+                    if player == 1:
+                        reply = [positions_x[gameId][0], positions_y[gameId][0]]
+                    else:
+                        reply = [positions_x[gameId][1], positions_y[gameId][1]]
 
                 print("Received: ", data)
                 print("Sending: ", reply)
 
-            connection.sendall(str.encode(make_information_play(reply)))
+            if data[0] == 'play':
+                connection.sendall(str.encode(make_information_play(reply)))
+            if data[0] == 'game':
+                connection.sendall(str.encode(make_information_game(reply)))
 
         except:
             break
@@ -95,6 +115,9 @@ while True:
         selected_map[gameId] = [-1, -1]
         selected_character[gameId] = ['', '']
         ready[gameId] = [0, 0]
+        player[gameId] = [0, 1]
+        positions_x[gameId] = [0, 0]
+        positions_y[gameId] = [0, 0]
         game_connected[gameId] = False
     else:
         game_connected[gameId] = True
