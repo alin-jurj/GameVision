@@ -17,7 +17,6 @@ back = pygame.image.load('../assets/misc/back.png')
 path_to_char = '../assets/characters/body/'
 path_to_icons = '../assets/icons/'
 text_store = FONT.render('INVENTORY', True, '#FFFFFF')
-text_money = text_font.render('NOT ENOUGH MONEY', True, '#FF0000')
 
 
 def inventory(screen, logged_in_user):

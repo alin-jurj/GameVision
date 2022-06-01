@@ -1,8 +1,10 @@
+import random
 import pygame
 from network import Network
 from gui_elements import buttons, map_selector, character_selector, image_buttons
-from pages import main_page
+from pages import main_page, game
 from database import queries
+from models import champion, skill
 
 pygame.init()
 
@@ -62,10 +64,12 @@ def play(screen, logged_in_user):
 
     character_sel = character_selector.CharacterSelector((120, 120), images, 0.9, owned_champions)
 
-    main = 0
+    start_game = False
+    main = False
     selected_map = -1
     character_choice = ""
     player_ready = 0
+    duration = 100
     enemy_selected_map, enemy_character, enemy_ready = read_selections(
         n.send(selections(selected_map, character_choice, player_ready)))
 
@@ -98,7 +102,7 @@ def play(screen, logged_in_user):
 
         if back_button.draw(screen):
             run = False
-            main = 1
+            main = True
 
         if map1.draw(screen):
             selected_map = 1
@@ -129,16 +133,20 @@ def play(screen, logged_in_user):
 
         if player_ready == 1:
             screen.blit(green_check, (780, 315))
+        else:
+            duration = 100
 
         if enemy_ready == 1:
             screen.blit(red_check, (1000, 315))
-
-        if player_ready and enemy_ready:
+        else:
             duration = 100
-            while duration > 0:
-                duration -= 1
 
+        if player_ready and enemy_ready and duration != 0:
+            duration -= 1
 
+        if duration == 0:
+            run = False
+            start_game = True
 
         if ready_button.draw(screen) and character_choice:
             if player_ready == 0:
@@ -152,5 +160,50 @@ def play(screen, logged_in_user):
 
         pygame.display.update()
 
-    if main == 1:
+    if start_game:
+        if selected_map == -1 and enemy_selected_map == -1:
+            map_number = random.randint(1, 3)
+        else:
+            if selected_map == -1:
+                map_number = enemy_selected_map
+            elif enemy_selected_map == -1:
+                map_number = selected_map
+            elif selected_map != enemy_selected_map:
+                map_number = random.choice([selected_map, enemy_selected_map])
+            else:
+                map_number = selected_map
+
+        if map_number == 1:
+            map_choice = map1_img
+        elif map_number == 2:
+            map_choice = map2_img
+        else:
+            map_choice = map3_img
+
+        player_character_query = queries.get_champion_by_name(character_choice)
+        enemy_character_query = queries.get_champion_by_name(enemy_character)
+
+        player_champion = champion.Champion(selected_character, player_character_query[0], player_character_query[2],
+                                             player_character_query[3], player_character_query[4],
+                                             player_character_query[5], player_character_query[6])
+        enemy_champion = champion.Champion(enemy_selected_character, enemy_character_query[0],
+                                            enemy_character_query[2], enemy_character_query[3], enemy_character_query[4],
+                                            enemy_character_query[5], enemy_character_query[6])
+
+        player_skills_rows = queries.get_champion_skills(player_character_query[0])
+        enemy_skills_rows = queries.get_champion_skills(enemy_character_query[0])
+
+        player_skills = []
+        for row in player_skills_rows:
+            champ_skill = skill.Skill(row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]))
+            player_skills.append(champ_skill)
+
+        enemy_skills = []
+        for row in enemy_skills_rows:
+            champ_skill = skill.Skill(row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]))
+            enemy_skills.append(champ_skill)
+
+        game.game(screen, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills)
+
+    if main:
         main_page.main_page(screen, logged_in_user)
