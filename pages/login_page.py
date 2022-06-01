@@ -5,13 +5,9 @@ from register_page import register
 from database import queries
 from models import user
 
-# import database.connectors as cn
-
-
 pygame.init()
 
 FPS = 60
-monster = pygame.image.load('../assets/icons/monster.png')
 background = pygame.image.load('../assets/background_login_resized.png')
 bkgreg = pygame.image.load('../assets/regi.png')
 WIDTH, HEIGHT = 1280, 720
@@ -88,8 +84,6 @@ def login():
                 run = False
             for box in input_boxes:
                 box.handle_event(event)
-
-        screen.blit(monster, (0, 0))
 
         for box in input_boxes:
             box.draw(screen, background, input_boxes)

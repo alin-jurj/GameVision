@@ -173,6 +173,15 @@ def all_ordered_users_by_win_rate():
     return row
 
 
+def get_champion_skills(championId):
+    mycursor.execute(
+        "SELECT * FROM Skill "
+        "WHERE championId = %s", (championId,)
+    )
+    row = mycursor.fetchall()
+    return row
+
+
 def delete_table():
     mycursor.execute("DROP TABLE User")
     db.commit()
@@ -180,11 +189,17 @@ def delete_table():
 
 def create_table():
     mycursor.execute(
-        "CREATE TABLE User_Icons (userId int NOT NULL, iconId int NOT NULL,"
-        "FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE ON UPDATE CASCADE,"
-        "FOREIGN KEY (iconId) REFERENCES Icon (iconId) ON DELETE CASCADE ON UPDATE CASCADE,"
-        "PRIMARY KEY (userId, iconId))"
+        "CREATE TABLE Skill (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+        "championId INT NOT NULL,"
+        "FOREIGN KEY (championId) REFERENCES Champion (championId) ON DELETE CASCADE ON UPDATE CASCADE,"
+        "skillName VARCHAR(20) NOT NULL, type VARCHAR(20) NOT NULL, ranged BOOLEAN NOT NULL,"
+        "damage INT NOT NULL, energyCost INT NOT NULL)"
     )
+
+# "CREATE TABLE Skills (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+# "FOREIGN KEY (championId) REFERENCES Champion (championId) ON DELETE CASCADE ON UPDATE CASCADE,"
+# "skillName VARCHAR(20) NOT NULL, type VARCHAR(20) NOT NULL, ranged BOOLEAN NOT NULL,"
+# "damage INT NOT NULL, energyCost INT NOT NULL)"
 
 # "CREATE TABLE User_Icons (userId int NOT NULL, iconId int NOT NULL,"
 # "FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE ON UPDATE CASCADE,"
