@@ -47,6 +47,15 @@ def update_user_money(userId, money):
     db.commit()
 
 
+def update_user_icon(userId, iconId):
+    mycursor.execute(
+        "UPDATE user "
+        "SET equippedIcon = %s "
+        "WHERE userId = %s", (iconId, userId)
+    )
+    db.commit()
+
+
 def add_user_champion(userId, championId):
     mycursor.execute(
         "INSERT INTO User_Champions (userId, championId) VALUES (%s, %s)",
@@ -57,7 +66,7 @@ def add_user_champion(userId, championId):
 
 def get_champion_by_name(championName):
     mycursor.execute(
-        "SELECT championId "
+        "SELECT championId, championName, hp, attack, defense, energy, price "
         "FROM champion "
         "WHERE championName = %s", (championName,)
     )
@@ -81,7 +90,7 @@ def select_random_champion(userId):
 
 def get_owned_champions(userId):
     mycursor.execute(
-        "SELECT champion.championId, championName "
+        "SELECT champion.championId, championName, hp, attack, defense, energy, price "
         "FROM champion "
         "JOIN user_champions ON champion.championId = user_champions.championId "
         "JOIN user ON user.userId = user_champions.userId "

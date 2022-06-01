@@ -9,7 +9,7 @@ coin = pygame.image.load('../assets/misc/coin.png')
 
 class Character_Buying_Box:
     def __init__(self, width, height, pos, champion_id, name, image, hp, attack, defense, energy, price, owned=False,
-                 show_owned=True):
+                 show_owned=True, reward=False, reward_level=0):
         self.top_rect = pygame.Rect(pos, (width, height))
         self.surf = pygame.Surface((width, height))
         self.surf.set_alpha(128)
@@ -35,6 +35,9 @@ class Character_Buying_Box:
         self.buy_button = buttons.Button('BUY', 60, 25, (self.top_rect.centerx + 10, self.top_rect.centery + 120), font)
         self.owned = owned
         self.show_owned = show_owned
+        self.reward = reward
+        self.reward_level = reward_level
+        self.claim_button = buttons.Button('CLAIM', 60, 25, (self.top_rect.centerx + 10, self.top_rect.centery + 120), font)
 
     def draw(self, screen, logged_in_user):
         screen.blit(self.surf, self.top_rect)
@@ -51,12 +54,23 @@ class Character_Buying_Box:
                     center=(self.top_rect.midbottom[0], self.top_rect.midbottom[1] - 20))
                 screen.blit(owned_text, owned_text_rect)
         else:
-            screen.blit(self.price, self.price_rect)
-            screen.blit(self.coins, self.coins_rect)
-            if self.buy_button.draw(screen):
-                if logged_in_user.get_money() >= int(self.champ_price):
-                    self.owned = True
-                    queries.add_user_champion(logged_in_user.get_userId(), self.champion_id)
-                    return self.champ_price
+            if self.reward:
+                if logged_in_user.get_lvl() < self.reward_level:
+                    reward_level_text = font.render("Level " + str(self.reward_level), True, '#FFFFFF')
+                    reward_level_text_rect = reward_level_text.get_rect(
+                        center=(self.top_rect.midbottom[0], self.top_rect.midbottom[1] - 20))
+                    screen.blit(reward_level_text, reward_level_text_rect)
                 else:
-                    return -1
+                    if self.claim_button.draw(screen):
+                        self.owned = True
+                        queries.add_user_champion(logged_in_user.get_userId(), self.champion_id)
+            else:
+                screen.blit(self.price, self.price_rect)
+                screen.blit(self.coins, self.coins_rect)
+                if self.buy_button.draw(screen):
+                    if logged_in_user.get_money() >= int(self.champ_price):
+                        self.owned = True
+                        queries.add_user_champion(logged_in_user.get_userId(), self.champion_id)
+                        return self.champ_price
+                    else:
+                        return -1
