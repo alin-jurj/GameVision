@@ -3,9 +3,6 @@ import pygame
 import math
 import cv2
 from camera.camera_controls import countFingers, hands_videos, detectHandsLandmarks
-from pages import main_page
-from database import queries
-from gui_elements import image_buttons
 from camera.hand_detector import HandDetector
 import game_result
 
@@ -56,7 +53,6 @@ class Champion:
         rand = random.randint(15, 25)
         damage = self.strength + rand
         target.hp -= damage
-        # check if target has died
         if target.hp < 1:
             target.hp = 0
             target.alive = False
@@ -66,7 +62,6 @@ class Champion:
         rand = random.randint(-5, 5)
         damage = self.strength + rand
         target.hp -= damage
-        # check if target has died
         if target.hp < 1:
             target.hp = 0
             target.alive = False
@@ -75,18 +70,23 @@ class Champion:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+    def verify_alive(self):
+        if self.hp < 1:
+            self.hp = 0
+            self.alive = False
+
     def get_hp(self):
         return self.hp
 
 
-def selections(position_x, position_y, enemy_hp):
-    return 'game,' + str(position_x) + ',' + str(position_y) + ',' + str(enemy_hp)
+def selections(position_x, position_y, enemy_hp, skill):
+    return 'game,' + str(position_x) + ',' + str(position_y) + ',' + str(enemy_hp) + ',' + str(skill)
 
 
 def read_selections(data):
     data = data.split(',')
     try:
-        return int(data[1]), int(data[2]), int(data[3])
+        return int(data[1]), int(data[2]), int(data[3]), int(data[4])
     except:
         return IndexError
 
@@ -108,8 +108,6 @@ class HealthBar:
 def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills):
     clock = pygame.time.Clock()
 
-    back_button = image_buttons.ImageButton(back, 1, (1136, 24))
-
     camera_video = cv2.VideoCapture(0)
     camera_video.set(3, 1280)
     camera_video.set(4, 960)
@@ -124,9 +122,10 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
     player_position_x = 100
     player_position_y = 500
+    player_skill = 0
 
-    enemy_position_x, enemy_position_y, player_hp = read_selections(
-        n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()))))
+    enemy_position_x, enemy_position_y, player_hp, enemy_skill = read_selections(
+        n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()), player_skill)))
 
     start_count = 200
     go = 0
@@ -181,8 +180,8 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         cv2.imshow('Fingers Counter', frame)
 
         try:
-            enemy_position_x, enemy_position_y, player_hp = read_selections(
-                n.send(selections(player_position_x, player_position_y, int(enemy.get_hp()))))
+            enemy_position_x, enemy_position_y, player_hp, enemy_skill = read_selections(
+                n.send(selections(player_position_x, player_position_y, int(enemy.get_hp()), player_skill)))
         except:
             end_game = True
             win_lose = 1
@@ -193,6 +192,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         enemy.draw(screen)
 
         player.update_hp(player_hp)
+        player.verify_alive()
 
         player_healthbar.draw(screen, player.hp)
         enemy_healthbar.draw(screen, enemy.hp)
@@ -290,7 +290,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     cv2.destroyAllWindows()
 
     if end_game:
-        if win_lose:
+        if win_lose == 1:
             game_result.end_game_result(screen, logged_in_user, map_choice, text_you_won)
         else:
             game_result.end_game_result(screen, logged_in_user, map_choice, text_you_lost)

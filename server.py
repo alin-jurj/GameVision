@@ -26,7 +26,7 @@ def read_information(string):
     if string[0] == 'play':
         return [string[0], int(string[1]), string[2], int(string[3])]
     elif string[0] == 'game':
-        return [string[0], int(string[1]), int(string[2]), int(string[3])]
+        return [string[0], int(string[1]), int(string[2]), int(string[3]), int(string[4])]
     else:
         return -1
 
@@ -36,7 +36,8 @@ def make_information_play(selections):
 
 
 def make_information_game(information):
-    return 'game,' + str(information[0]) + ',' + str(information[1]) + ',' + str(information[2])
+    return 'game,' + str(information[0]) + ',' + str(information[1]) + ',' + str(information[2]) + ',' + str(
+        information[3])
 
 
 selected_map = {}
@@ -47,6 +48,7 @@ player = {}
 positions_x = {}
 positions_y = {}
 hp = {}
+skill = {}
 
 
 def threaded_client(connection, player, gameId):
@@ -65,6 +67,7 @@ def threaded_client(connection, player, gameId):
                 positions_x[gameId][player] = data[1]
                 positions_y[gameId][player] = data[2]
                 hp[gameId][player] = data[3]
+                skill[gameId][player] = data[4]
             else:
                 print('NU')
 
@@ -79,9 +82,9 @@ def threaded_client(connection, player, gameId):
                         reply = [selected_map[gameId][1], selected_character[gameId][1], ready[gameId][1]]
                 elif data[0] == 'game':
                     if player == 1:
-                        reply = [positions_x[gameId][0], positions_y[gameId][0], hp[gameId][0]]
+                        reply = [positions_x[gameId][0], positions_y[gameId][0], hp[gameId][0], skill[gameId][0]]
                     else:
-                        reply = [positions_x[gameId][1], positions_y[gameId][1], hp[gameId][1]]
+                        reply = [positions_x[gameId][1], positions_y[gameId][1], hp[gameId][1], skill[gameId][1]]
 
                 print("Received: ", data)
                 print("Sending: ", reply)
@@ -103,6 +106,7 @@ def threaded_client(connection, player, gameId):
         del positions_x[gameId]
         del positions_y[gameId]
         del hp[gameId]
+        del skill[gameId]
         print("Closing game ", gameId)
     except:
         pass
@@ -124,6 +128,7 @@ while True:
         positions_x[gameId] = [0, 0]
         positions_y[gameId] = [500, 500]
         hp[gameId] = [150, 150]
+        skill[gameId] = [0, 0]
         game_connected[gameId] = False
     else:
         game_connected[gameId] = True
