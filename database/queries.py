@@ -196,7 +196,7 @@ def create_table():
         "damage INT NOT NULL, energyCost INT NOT NULL)"
     )
 
-# "CREATE TABLE Skills (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+# "CREATE TABLE Skill (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
 # "FOREIGN KEY (championId) REFERENCES Champion (championId) ON DELETE CASCADE ON UPDATE CASCADE,"
 # "skillName VARCHAR(20) NOT NULL, type VARCHAR(20) NOT NULL, ranged BOOLEAN NOT NULL,"
 # "damage INT NOT NULL, energyCost INT NOT NULL)"

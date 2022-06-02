@@ -183,12 +183,14 @@ def play(screen, logged_in_user):
         player_character_query = queries.get_champion_by_name(character_choice)
         enemy_character_query = queries.get_champion_by_name(enemy_character)
 
-        player_champion = champion.Champion(selected_character, player_character_query[0], player_character_query[2],
-                                             player_character_query[3], player_character_query[4],
-                                             player_character_query[5], player_character_query[6])
+        player_champion = champion.Champion(selected_character, player_character_query[0],
+                                            character_choice, player_character_query[2],
+                                            player_character_query[3], player_character_query[4],
+                                            player_character_query[5], player_character_query[6])
         enemy_champion = champion.Champion(enemy_selected_character, enemy_character_query[0],
-                                            enemy_character_query[2], enemy_character_query[3], enemy_character_query[4],
-                                            enemy_character_query[5], enemy_character_query[6])
+                                           enemy_character, enemy_character_query[2],
+                                           enemy_character_query[3], enemy_character_query[4],
+                                           enemy_character_query[5], enemy_character_query[6])
 
         player_skills_rows = queries.get_champion_skills(player_character_query[0])
         enemy_skills_rows = queries.get_champion_skills(enemy_character_query[0])

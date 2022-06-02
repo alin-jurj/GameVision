@@ -1,7 +1,8 @@
 class Champion:
-    def __init__(self, image, championId, hp, attack, defense, energy, price, block_status=False):
+    def __init__(self, image, champion_id, champion_name, hp, attack, defense, energy, price, block_status=False):
         self.image = image
-        self.championId = championId
+        self.championId = champion_id
+        self.championName = champion_name
         self.hp = hp
         self.attack = attack
         self.defense = defense
@@ -26,3 +27,6 @@ class Champion:
 
     def get_image(self):
         return self.image
+
+    def get_champion_name(self):
+        return self.championName
