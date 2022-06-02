@@ -1,7 +1,7 @@
 import pygame
 from pages import main_page
 from database import queries
-from gui_elements import image_buttons, buttons, character_buying_box, icon_box
+from gui_elements import image_buttons
 
 pygame.init()
 
