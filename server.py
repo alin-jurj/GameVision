@@ -117,7 +117,7 @@ while True:
         ready[gameId] = [0, 0]
         player[gameId] = [0, 1]
         positions_x[gameId] = [0, 0]
-        positions_y[gameId] = [0, 0]
+        positions_y[gameId] = [500, 500]
         game_connected[gameId] = False
     else:
         game_connected[gameId] = True
