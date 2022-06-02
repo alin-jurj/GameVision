@@ -22,6 +22,8 @@ FONT = pygame.font.Font(None, 56)
 text_character = FONT.render('CHARACTER SELECT', True, '#FFFFFF')
 text_stage = FONT.render('STAGE SELECT', True, '#FFFFFF')
 back = pygame.image.load('../assets/misc/back.png')
+punch_img = pygame.image.load('../assets/skills/punch.png')
+fireball_img = pygame.image.load('../assets/skills/fireball.png')
 
 
 def scale_image(image, scale):
@@ -197,7 +199,9 @@ def play(screen, logged_in_user):
 
         player_skills = []
         for row in player_skills_rows:
-            champ_skill = skill.Skill(row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]))
+            image = pygame.image.load('../assets/skills/' + row[2] + '.png')
+            champ_skill = skill.Skill(0, 0, row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]),
+                                      image)
             player_skills.append(champ_skill)
 
         enemy_skills = []

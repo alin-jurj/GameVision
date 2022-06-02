@@ -8,6 +8,7 @@ from database import queries
 from gui_elements import image_buttons
 from camera.hand_detector import HandDetector
 import game_result
+from models import skill
 
 pygame.init()
 
@@ -197,6 +198,11 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         player_healthbar.draw(screen, player.hp)
         enemy_healthbar.draw(screen, enemy.hp)
 
+        for i in player_skills:
+            i.update_position(player_position_x, player_position_y)
+        for i in enemy_skills:
+            i.update_position(enemy_position_x, enemy_position_y)
+
         if not player.alive:
             end_game = True
             win_lose = 0
@@ -254,15 +260,15 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
                     punch_counter = 5
                     player.attack(enemy)
             elif movement_y[2] < (movement_y[1] - 3) and movement_y[1] < (movement_y[0] - 3):
-                if player_position_x + 200 >= enemy_position_x:
+                if math.fabs(player_position_x - enemy_position_x) <= 200:
+                    for i in range(0, player_position_x - enemy_position_x, 5):
+                        player_skills[1].draw(screen)
                     skill_counter += 30
                     player.attack_skill(enemy)
 
         if punch_counter != 0:
-            screen.blit(punch_img, (player_position_x + 40, player_position_y - 30))
+            player_skills[0].draw(screen)
             punch_counter -= 1
-        if skill_counter <= enemy_position_x - player_position_x - 30:
-            screen.blit(fireball_img, (player_position_x + 30 + skill_counter, player_position_y))
 
         if last_change > 0 and player_x_change < 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
@@ -283,6 +289,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         player.update_x(player_position_x)
         enemy.update_x(enemy_position_x)
+
 
         pygame.display.update()
 
