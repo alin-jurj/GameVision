@@ -12,27 +12,27 @@ mycursor = db.cursor()
 
 
 def logs(input_box1, input_box2):
-    mycursor.execute("SELECT * FROM User WHERE username=%s AND password=%s",
+    mycursor.execute("SELECT * FROM user WHERE username=%s AND password=%s",
                      (input_box1.get_text(), input_box2.get_text()))
     row = mycursor.fetchone()
     return row
 
 
 def search_username(username_field):
-    mycursor.execute("SELECT * FROM User WHERE username=%s", (username_field.get_text(),))
+    mycursor.execute("SELECT * FROM user WHERE username=%s", (username_field.get_text(),))
     row = mycursor.fetchone()
     return row
 
 
 def search_email(email_field):
-    mycursor.execute("SELECT * FROM User WHERE email=%s", (email_field.get_text(),))
+    mycursor.execute("SELECT * FROM user WHERE email=%s", (email_field.get_text(),))
     row = mycursor.fetchone()
     return row
 
 
 def add_user(username_field, password_field, email_field):
     mycursor.execute(
-        "INSERT INTO User (username, password, email, wins, losses, lvl, xp, money, equippedIcon) "
+        "INSERT INTO user (username, password, email, wins, losses, lvl, xp, money, equippedIcon) "
         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (username_field.get_text(), password_field.get_text(), email_field.get_text(), 0, 0, 1, 0, 200, 1))
     db.commit()
@@ -58,7 +58,7 @@ def update_user_icon(userId, iconId):
 
 def add_user_champion(userId, championId):
     mycursor.execute(
-        "INSERT INTO User_Champions (userId, championId) VALUES (%s, %s)",
+        "INSERT INTO user_champions (userId, championId) VALUES (%s, %s)",
         (userId, championId)
     )
     db.commit()
@@ -128,7 +128,7 @@ def get_not_owned_champions(userId):
 
 def add_user_icon(userId, iconId):
     mycursor.execute(
-        "INSERT INTO User_Icons (userId, iconId) VALUES (%s, %s)",
+        "INSERT INTO user_icons (userId, iconId) VALUES (%s, %s)",
         (userId, iconId)
     )
     db.commit()
@@ -168,14 +168,14 @@ def get_buyable_icons():
 
 
 def all_ordered_users_by_win_rate():
-    mycursor.execute("SELECT * FROM User ORDER BY wins/(wins+losses) DESC, wins DESC")
+    mycursor.execute("SELECT * FROM user ORDER BY wins/(wins+losses) DESC, wins DESC")
     row = mycursor.fetchall()
     return row
 
 
 def get_champion_skills(championId):
     mycursor.execute(
-        "SELECT * FROM Skill "
+        "SELECT * FROM skill "
         "WHERE championId = %s", (championId,)
     )
     row = mycursor.fetchall()
@@ -183,17 +183,16 @@ def get_champion_skills(championId):
 
 
 def delete_table():
-    mycursor.execute("DROP TABLE User")
+    mycursor.execute("DROP TABLE user")
     db.commit()
 
 
 def create_table():
     mycursor.execute(
-        "CREATE TABLE Skill (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
-        "championId INT NOT NULL,"
+        "CREATE TABLE User_Champions (userId int NOT NULL, championId int NOT NULL,"
+        "FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE ON UPDATE CASCADE,"
         "FOREIGN KEY (championId) REFERENCES Champion (championId) ON DELETE CASCADE ON UPDATE CASCADE,"
-        "skillName VARCHAR(20) NOT NULL, type VARCHAR(20) NOT NULL, ranged BOOLEAN NOT NULL,"
-        "damage INT NOT NULL, energyCost INT NOT NULL)"
+        "PRIMARY KEY (userId, championId))"
     )
 
 # "CREATE TABLE Skills (skillId int PRIMARY KEY AUTO_INCREMENT NOT NULL,"
@@ -219,8 +218,8 @@ def create_table():
 # "FOREIGN KEY (championId) REFERENCES Champion (championId) ON DELETE RESTRICT ON UPDATE CASCADE,"
 # "PRIMARY KEY (userId, championId))"
 
-# "CREATE TABLE Champion (championId int PRIMARY KEY AUTO_INCREMENT NOT NULL, championName VARCHAR(12) NOT NULL,"
-# " hp INT(7) NOT NULL, attack INT(7) NOT NULL, defense INT(7) NOT NULL, energy INT(7) NOT NULL, price INT(7))"
+#  "CREATE TABLE Champion (championId int PRIMARY KEY AUTO_INCREMENT NOT NULL, championName VARCHAR(12) NOT NULL,"
+#  " hp INT(7) NOT NULL, attack INT(7) NOT NULL, defense INT(7) NOT NULL, energy INT(7) NOT NULL, price INT(7))"
 
 # "CREATE TABLE User (userId int PRIMARY KEY AUTO_INCREMENT NOT NULL, "
 # "username VARCHAR(13) NOT NULL, password VARCHAR(50) NOT NULL, "

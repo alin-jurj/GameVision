@@ -1,3 +1,4 @@
+import random
 import pygame
 import cv2
 from camera.camera_controls import countFingers, hands_videos, detectHandsLandmarks
@@ -5,7 +6,7 @@ from pages import main_page
 from database import queries
 from gui_elements import image_buttons, buttons, character_buying_box, icon_box
 from camera.hand_detector import HandDetector
-
+from game_result import game_result
 pygame.init()
 
 FPS = 60
@@ -19,6 +20,51 @@ back = pygame.image.load('../assets/misc/back.png')
 path_to_char = '../assets/characters/body/'
 path_to_icons = '../assets/icons/'
 text_get_ready = FONT.render('GET READY!', True, '#FF0000')
+text_you_lost = FONT.render('YOU LOST!', True, '#FF0000')
+text_you_won = FONT.render('YOU WON!', True, '#FF0000')
+red = (255, 0, 0)
+green = (0, 255, 0)
+
+
+class Fighter():
+    def __init__(self, x, y, name, max_hp, strength, image):
+        self.name = name
+        self.max_hp = max_hp
+        self.hp = max_hp
+        self.alive = True
+        self.strength=strength
+        self.frame_index = 0
+        self.action = 0  # 0.idle, 1.attack, 2:hurt, 3:dead
+        self.update_time = pygame.time.get_ticks()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+    def attack_skill(self, target):
+        rand = random.randint(15, 25)
+        damage = self.strength + rand
+        target.hp -= damage
+        # check if target has died
+        if target.alive < 1:
+            target.hp = 0
+            target.alive = False
+        self.action = 1
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
+    def attack(self, target):
+        rand = random.randint(-5, 5)
+        damage = self.strength + rand
+        target.hp -= damage
+        # check if target has died
+        if target.alive < 1:
+            target.hp = 0
+            target.alive = False
+        self.action = 1
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
 
 
 def selections(position_x, position_y):
@@ -30,6 +76,18 @@ def read_selections(data):
     return int(data[1]), int(data[2])
 
 
+class HealthBar():
+    def __init__(self, x, y, hp, max_hp):
+        self.x = x
+        self.y = y
+        self.hp = hp
+        self.max_hp = max_hp
+
+    def draw(self, screen, hp):
+        self.hp = hp
+        ratio = self.hp / self.max_hp
+        pygame.draw.rect(screen, red, (self.x, self.y, 150, 20))
+        pygame.draw.rect(screen, green, (self.x, self.y, 150 * ratio, 20))
 def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills):
     clock = pygame.time.Clock()
 
@@ -49,14 +107,24 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
     player_position_x = 100
     player_position_y = 500
-    #enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+
+    enemy_position_x=700
+    enemy_position_y=500
+    # enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
     start_count = 100
     go = 0
     playerX_change = 0
     last_change = 1
     player_champ_img = player_champion.get_image()
+    enemy_champ_img = enemy_champion.get_image()
     movement_x = []
     x_counter = 0
+
+    player = Fighter(player_position_x, player_position_y, 'Knight', 30, 10, 3, player_champ_img)
+    enemy = Fighter(enemy_position_x, enemy_position_y, 'Bandit', 30, enemy_champ_img)
+
+    player_healthbar=HealthBar(100,250, 100, 100)
+    enemy_healthbar=HealthBar(900,250, 100, 100)
 
     while run:
         pointIndex = 0
@@ -94,11 +162,18 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         # Display the frame.
         cv2.imshow('Fingers Counter', frame)
 
-        #enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+        # enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+        player.draw(screen)
+        enemy.draw(screen)
 
-        screen.blit(player_champ_img, (player_position_x, player_position_y))
+        player_healthbar.draw(screen, player.hp)
+        enemy_healthbar.draw(screen, enemy.hp)
+        #screen.blit(player_champ_img, (player_position_x, player_position_y))
         #screen.blit(enemy_champion.get_image(), (enemy_position_x, enemy_position_y))
-
+        if player.alive==False:
+            game_result.game_result(screen, logged_in_user,map_choice, text_you_lost)
+        if enemy.alive==False:
+            game_result.game_result(screen, logged_in_user,map_choice, text_you_won)
         if start_count != 0:
             screen.blit(text_get_ready, (500, 60))
             start_count -= 1
@@ -111,9 +186,19 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
             movement_x = []
 
         if pointIndex != 0:
-            movement_x.append(pointIndex[0]) # index[0] -> coordonata x a degetului aratator, index[1] -> coordonata y
+            movement_x.append(pointIndex[0])  # index[0] -> coordonata x a degetului aratator, index[1] -> coordonata y
             x_counter += 1
+        if start_count != 0:
+            screen.blit(text_get_ready, (500, 60))
+            start_count -= 1
 
+        if y_counter == 3:
+            y_counter = 0
+            movement_y = []
+
+        if pointIndex != 0:
+            movement_y.append(pointIndex[1])  # index[1] -> coordonata y a degetului aratator
+            y_counter += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -135,7 +220,15 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
                 playerX_change = 15
             else:
                 playerX_change = 0
-
+        if len(movement_y) == 3:
+            if movement_y[2] > (movement_y[1] + 3) and movement_y[1] > (movement_y[0] + 3):
+                if player_position_x+50 >= enemy_position_x:
+                    player.attack(enemy)
+            elif movement_y[2] < (movement_y[1] - 3) and movement_y[1] < (movement_y[0] - 3):
+                if player_position_x+200 >= enemy_position_x:
+                    for i in range(enemy_position_x-player_position_x-30, 10):
+                        screen.blit(pygame.image.load(player_skills), (player_position_x+30+i, player_position_y))
+                    player.attack_skill(enemy)
         if last_change > 0 and playerX_change < 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
             last_change = playerX_change
