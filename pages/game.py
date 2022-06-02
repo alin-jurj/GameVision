@@ -1,5 +1,6 @@
 import random
 import pygame
+import math
 import cv2
 from camera.camera_controls import countFingers, hands_videos, detectHandsLandmarks
 from pages import main_page
@@ -19,6 +20,7 @@ button_font = pygame.font.SysFont('Arial', 28)
 text_font = pygame.font.SysFont('Arial', 32)
 back = pygame.image.load('../assets/misc/back.png')
 punch_img = pygame.image.load('../assets/skills/punch.png')
+fireball_img = pygame.image.load('../assets/skills/fireball.png')
 path_to_char = '../assets/characters/body/'
 path_to_icons = '../assets/icons/'
 text_get_ready = FONT.render('GET READY!', True, '#FF0000')
@@ -129,7 +131,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     enemy_position_x, enemy_position_y, player_hp = read_selections(
         n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()))))
 
-    start_count = 500
+    start_count = 200
     go = 0
     player_x_change = 0
     last_change = 1
@@ -147,6 +149,9 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
     player_healthbar = HealthBar(100, 100, int(player_champion.get_hp()), int(player_champion.get_hp()))
     enemy_healthbar = HealthBar(1000, 100, int(enemy_champion.get_hp()), int(enemy_champion.get_hp()))
+
+    punch_counter = 0
+    skill_counter=0
 
     while run:
         pointIndex = 0
@@ -235,15 +240,19 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         if len(movement_y) == 3 and go:
             if movement_y[2] > (movement_y[1] + 3) and movement_y[1] > (movement_y[0] + 3):
-                if player_position_x + 50 >= enemy_position_x:
-                    screen.blit(punch_img, (player_position_x + 30 + i, player_position_y-50))
+                if math.fabs(player_position_x - enemy_position_x <= 100) and punch_counter == 0:
+                    punch_counter = 5
                     player.attack(enemy)
             elif movement_y[2] < (movement_y[1] - 3) and movement_y[1] < (movement_y[0] - 3):
                 if player_position_x + 200 >= enemy_position_x:
-                    for i in range(enemy_position_x - player_position_x - 30, 10):
-                        print(1)
-                        #screen.blit(punch_img, (player_position_x + 30 + i, player_position_y))
+                    skill_counter += 30
                     player.attack_skill(enemy)
+
+        if punch_counter != 0:
+            screen.blit(punch_img, (player_position_x + 40, player_position_y - 30))
+            punch_counter -= 1
+        if skill_counter <=enemy_position_x-player_position_x-30:
+            screen.blit(fireball_img, (player_position_x + 30 + skill_counter, player_position_y))
 
         if last_change > 0 and player_x_change < 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
