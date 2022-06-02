@@ -80,8 +80,11 @@ class Champion:
         return self.hp
 
 
-def selections(position_x, position_y, enemy_hp, skill):
-    return 'game,' + str(position_x) + ',' + str(position_y) + ',' + str(enemy_hp) + ',' + str(skill)
+def selections(position_x, position_y, enemy_hp, skl):
+    try:
+        return 'game,' + str(position_x) + ',' + str(position_y) + ',' + str(enemy_hp) + ',' + str(skl)
+    except:
+        return TypeError
 
 
 def read_selections(data):
@@ -119,14 +122,22 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     detector = HandDetector(detectionCon=0.8, maxHands=1)
 
     run = True
-    main = False
+    punch_counter = 0
+    skill_counter = 0
+    win_lose = 0
+    end_game = False
 
     player_position_x = 100
     player_position_y = 500
     player_skill = 0
 
-    enemy_position_x, enemy_position_y, player_hp, enemy_skill = read_selections(
-        n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()), player_skill)))
+    try:
+        enemy_position_x, enemy_position_y, player_hp, enemy_skill = read_selections(
+            n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()), player_skill)))
+    except:
+        run = False
+        win_lose = 1
+        end_game = True
 
     start_count = 200
     go = 0
@@ -146,11 +157,6 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
     player_healthbar = HealthBar(100, 100, int(player_champion.get_hp()), int(player_champion.get_hp()))
     enemy_healthbar = HealthBar(1000, 100, int(enemy_champion.get_hp()), int(enemy_champion.get_hp()))
-
-    punch_counter = 0
-    skill_counter = 0
-    win_lose = 0
-    end_game = False
 
     while run:
         pointIndex = 0
@@ -200,6 +206,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         for i in player_skills:
             i.update_position(player_position_x, player_position_y)
+
         for i in enemy_skills:
             i.update_position(enemy_position_x, enemy_position_y)
 
@@ -266,9 +273,15 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
                     skill_counter += 30
                     player.attack_skill(enemy)
 
+        if enemy_skill == 1:
+            enemy_skills[0].draw(screen)
+
         if punch_counter != 0:
             player_skills[0].draw(screen)
+            player_skill = 1
             punch_counter -= 1
+        else:
+            player_skill = 0
 
         if last_change > 0 and player_x_change < 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
@@ -282,14 +295,13 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         player_position_x = player_position_x + player_x_change
 
-        if player_position_x <= 0:
-            player_position_x = 0
-        elif player_position_x >= 1060:
-            player_position_x = 1060
+        if player_position_x <= 100:
+            player_position_x = 100
+        elif player_position_x >= 1100:
+            player_position_x = 1100
 
         player.update_x(player_position_x)
         enemy.update_x(enemy_position_x)
-
 
         pygame.display.update()
 

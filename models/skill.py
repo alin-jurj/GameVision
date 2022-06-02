@@ -8,6 +8,7 @@ class Skill:
         self.ranged = ranged
         self.damage = damage
         self.energy_cost = energy_cost
+        self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 

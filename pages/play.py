@@ -206,7 +206,9 @@ def play(screen, logged_in_user):
 
         enemy_skills = []
         for row in enemy_skills_rows:
-            champ_skill = skill.Skill(row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]))
+            image = pygame.image.load('../assets/skills/' + row[2] + '.png')
+            champ_skill = skill.Skill(0, 0, row[0], row[1], row[2], row[3], int(row[4]), int(row[5]), int(row[6]),
+                                      image)
             enemy_skills.append(champ_skill)
 
         game.game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion, player_skills, enemy_skills)
