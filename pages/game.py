@@ -119,12 +119,9 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     player_position_x = 100
     player_position_y = 500
 
-    enemy_position_x = 700
-    enemy_position_y = 500
+    enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
 
-    # enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
-
-    start_count = 100
+    start_count = 500
     go = 0
     player_x_change = 0
     last_change = 1
@@ -172,14 +169,12 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         cv2.imshow('Fingers Counter', frame)
 
-        # enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+        enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
         player.draw(screen)
         enemy.draw(screen)
 
         player_healthbar.draw(screen, player.hp)
         enemy_healthbar.draw(screen, enemy.hp)
-        # screen.blit(player_champ_img, (player_position_x, player_position_y))
-        # screen.blit(enemy_champion.get_image(), (enemy_position_x, enemy_position_y))
 
         if not player.alive:
             game_result.end_game_result(screen, logged_in_user, map_choice, text_you_lost)
@@ -226,23 +221,26 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
             else:
                 player_x_change = 0
 
-        if len(movement_y) == 3:
+        if len(movement_y) == 3 and go:
             if movement_y[2] > (movement_y[1] + 3) and movement_y[1] > (movement_y[0] + 3):
                 if player_position_x + 50 >= enemy_position_x:
                     player.attack(enemy)
             elif movement_y[2] < (movement_y[1] - 3) and movement_y[1] < (movement_y[0] - 3):
                 if player_position_x + 200 >= enemy_position_x:
                     for i in range(enemy_position_x - player_position_x - 30, 10):
-                        screen.blit(pygame.image.load(player_skills), (player_position_x + 30 + i, player_position_y))
+                        print('Ok')
+                        #screen.blit(pygame.image.load(player_skills), (player_position_x + 30 + i, player_position_y))
                     player.attack_skill(enemy)
 
         if last_change > 0 and player_x_change < 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
             last_change = player_x_change
+            player.update_image(player_champ_img)
 
         if last_change < 0 and player_x_change > 0:
             player_champ_img = pygame.transform.flip(player_champ_img, True, False)
             last_change = player_x_change
+            player.update_image(player_champ_img)
 
         player_position_x = player_position_x + player_x_change
 
@@ -252,6 +250,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
             player_position_x = 1060
 
         player.update_x(player_position_x)
+        enemy.update_x(enemy_position_x)
 
         pygame.display.update()
 
