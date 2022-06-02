@@ -18,6 +18,7 @@ FONT = pygame.font.Font(None, 72)
 button_font = pygame.font.SysFont('Arial', 28)
 text_font = pygame.font.SysFont('Arial', 32)
 back = pygame.image.load('../assets/misc/back.png')
+punch_img = pygame.image.load('../assets/skills/punch.png')
 path_to_char = '../assets/characters/body/'
 path_to_icons = '../assets/icons/'
 text_get_ready = FONT.render('GET READY!', True, '#FF0000')
@@ -41,6 +42,9 @@ class Champion:
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+
+    def update_hp(self, new_hp):
+        self.hp = new_hp
 
     def update_x(self, new_x):
         self.rect.center = (new_x, self.y)
@@ -75,14 +79,17 @@ class Champion:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+    def get_hp(self):
+        return self.hp
 
-def selections(position_x, position_y):
-    return 'game,' + str(position_x) + ',' + str(position_y)
+
+def selections(position_x, position_y, enemy_hp):
+    return 'game,' + str(position_x) + ',' + str(position_y) + ',' + str(enemy_hp)
 
 
 def read_selections(data):
     data = data.split(',')
-    return int(data[1]), int(data[2])
+    return int(data[1]), int(data[2]), int(data[3])
 
 
 class HealthBar:
@@ -119,7 +126,8 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     player_position_x = 100
     player_position_y = 500
 
-    enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+    enemy_position_x, enemy_position_y, player_hp = read_selections(
+        n.send(selections(player_position_x, player_position_y, int(enemy_champion.get_hp()))))
 
     start_count = 500
     go = 0
@@ -169,9 +177,13 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         cv2.imshow('Fingers Counter', frame)
 
-        enemy_position_x, enemy_position_y = read_selections(n.send(selections(player_position_x, player_position_y)))
+        enemy_position_x, enemy_position_y, player_hp = read_selections(
+            n.send(selections(player_position_x, player_position_y, int(enemy.get_hp()))))
+
         player.draw(screen)
         enemy.draw(screen)
+
+        player.update_hp(player_hp)
 
         player_healthbar.draw(screen, player.hp)
         enemy_healthbar.draw(screen, enemy.hp)
@@ -224,12 +236,13 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         if len(movement_y) == 3 and go:
             if movement_y[2] > (movement_y[1] + 3) and movement_y[1] > (movement_y[0] + 3):
                 if player_position_x + 50 >= enemy_position_x:
+                    screen.blit(punch_img, (player_position_x + 30 + i, player_position_y-50))
                     player.attack(enemy)
             elif movement_y[2] < (movement_y[1] - 3) and movement_y[1] < (movement_y[0] - 3):
                 if player_position_x + 200 >= enemy_position_x:
                     for i in range(enemy_position_x - player_position_x - 30, 10):
-                        print('Ok')
-                        #screen.blit(pygame.image.load(player_skills), (player_position_x + 30 + i, player_position_y))
+                        print(1)
+                        #screen.blit(punch_img, (player_position_x + 30 + i, player_position_y))
                     player.attack_skill(enemy)
 
         if last_change > 0 and player_x_change < 0:
