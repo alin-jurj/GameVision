@@ -3,7 +3,7 @@ from _thread import *
 import sys
 
 server = "0.0.0.0"
-port = 5554
+port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

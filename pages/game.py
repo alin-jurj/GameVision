@@ -38,8 +38,6 @@ class Champion:
         self.hp = max_hp
         self.alive = True
         self.strength = strength
-        self.frame_index = 0
-        self.action = 0  # 0.idle, 1.attack, 2:hurt, 3:dead
         self.update_time = pygame.time.get_ticks()
         self.image = image
         self.rect = self.image.get_rect()
@@ -59,11 +57,9 @@ class Champion:
         damage = self.strength + rand
         target.hp -= damage
         # check if target has died
-        if target.alive < 1:
+        if target.hp < 1:
             target.hp = 0
             target.alive = False
-        self.action = 1
-        self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
 
     def attack(self, target):
@@ -71,11 +67,9 @@ class Champion:
         damage = self.strength + rand
         target.hp -= damage
         # check if target has died
-        if target.alive < 1:
+        if target.hp < 1:
             target.hp = 0
             target.alive = False
-        self.action = 1
-        self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
 
     def draw(self, screen):
@@ -91,7 +85,10 @@ def selections(position_x, position_y, enemy_hp):
 
 def read_selections(data):
     data = data.split(',')
-    return int(data[1]), int(data[2]), int(data[3])
+    try:
+        return int(data[1]), int(data[2]), int(data[3])
+    except:
+        return IndexError
 
 
 class HealthBar:
@@ -151,7 +148,9 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     enemy_healthbar = HealthBar(1000, 100, int(enemy_champion.get_hp()), int(enemy_champion.get_hp()))
 
     punch_counter = 0
-    skill_counter=0
+    skill_counter = 0
+    win_lose = 0
+    end_game = False
 
     while run:
         pointIndex = 0
@@ -166,7 +165,6 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         if hands:
             lmList = hands[0]['lmList']
             pointIndex = lmList[8][0:2]
-            print(pointIndex)
             cv2.circle(img, pointIndex, 20, (200, 0, 200), cv2.FILLED)
 
         if not ok:
@@ -182,8 +180,14 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
 
         cv2.imshow('Fingers Counter', frame)
 
-        enemy_position_x, enemy_position_y, player_hp = read_selections(
-            n.send(selections(player_position_x, player_position_y, int(enemy.get_hp()))))
+        try:
+            enemy_position_x, enemy_position_y, player_hp = read_selections(
+                n.send(selections(player_position_x, player_position_y, int(enemy.get_hp()))))
+        except:
+            end_game = True
+            win_lose = 1
+            run = False
+            break
 
         player.draw(screen)
         enemy.draw(screen)
@@ -194,10 +198,16 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         enemy_healthbar.draw(screen, enemy.hp)
 
         if not player.alive:
-            game_result.end_game_result(screen, logged_in_user, map_choice, text_you_lost)
+            end_game = True
+            win_lose = 0
+            run = False
+            break
 
         if not enemy.alive:
-            game_result.end_game_result(screen, logged_in_user, map_choice, text_you_won)
+            end_game = True
+            win_lose = 1
+            run = False
+            break
 
         if start_count != 0:
             screen.blit(text_get_ready, (500, 60))
@@ -251,7 +261,7 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
         if punch_counter != 0:
             screen.blit(punch_img, (player_position_x + 40, player_position_y - 30))
             punch_counter -= 1
-        if skill_counter <=enemy_position_x-player_position_x-30:
+        if skill_counter <= enemy_position_x - player_position_x - 30:
             screen.blit(fireball_img, (player_position_x + 30 + skill_counter, player_position_y))
 
         if last_change > 0 and player_x_change < 0:
@@ -279,5 +289,8 @@ def game(screen, n, logged_in_user, map_choice, player_champion, enemy_champion,
     camera_video.release()
     cv2.destroyAllWindows()
 
-    if main:
-        main_page.main_page(screen, logged_in_user)
+    if end_game:
+        if win_lose:
+            game_result.end_game_result(screen, logged_in_user, map_choice, text_you_won)
+        else:
+            game_result.end_game_result(screen, logged_in_user, map_choice, text_you_lost)

@@ -1,4 +1,4 @@
 host = "localhost"
 user = "root"
-passwd = "alinMYSQL1!"
+passwd = "Bisconu_15"
 database = "testdatabase"
