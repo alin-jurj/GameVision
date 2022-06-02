@@ -47,6 +47,30 @@ def update_user_money(userId, money):
     db.commit()
 
 
+def update_user_lvl_xp(userId, lvl, xp):
+    mycursor.execute(
+        "UPDATE user "
+        "SET lvl = %s, xp = %s "
+        "WHERE userId = %s", (lvl, xp, userId)
+    )
+
+
+def update_wins(userId, wins):
+    mycursor.execute(
+        "UPDATE user "
+        "SET wins = %s "
+        "WHERE userId = %s", (wins, userId)
+    )
+
+
+def update_losses(userId, losses):
+    mycursor.execute(
+        "UPDATE user "
+        "SET losses = %s "
+        "WHERE userId = %s", (losses, userId)
+    )
+
+
 def update_user_icon(userId, iconId):
     mycursor.execute(
         "UPDATE user "

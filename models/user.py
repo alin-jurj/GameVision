@@ -28,8 +28,29 @@ class User:
     def set_money(self, price):
         self.money = self.money - price
 
+    def add_money(self, add):
+        self.money = self.money + add
+
+    def set_xp(self, add):
+        self.xp = self.xp + add
+        if self.xp >= 1000:
+            self.xp = 0
+            self.lvl = self.lvl + 1
+
     def get_equipped_icon(self):
         return self.equipped_icon
 
     def set_equipped_icon(self, icon_id):
         self.equipped_icon = icon_id
+
+    def add_wins(self):
+        self.wins = self.wins + 1
+
+    def get_wins(self):
+        return self.wins
+
+    def add_losses(self):
+        self.losses = self.losses + 1
+
+    def get_losses(self):
+        return self.losses
